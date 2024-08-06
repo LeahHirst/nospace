@@ -51,6 +51,7 @@ The general pattern for the IO instructions is that the first character is `‌`
 ### Stack manipulation
 
 | Commands‍ | Parameters‍ | Meaning |
+| - | - | - |
 | `​` | Number‍ | Push a number to the stack |
 | `‍​‍` | -‍ | Duplicate the top item on the stack |
 | `‍‌‍` | -‍ | Swap the top two items on the stack |
