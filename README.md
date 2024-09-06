@@ -59,7 +59,7 @@ There are different types of commands in Nospace, and they all have different In
 
 | IMP | Command |
 | --- | ------- |
-| `[ZWNBSP]` | Types |
+| `⁠` | Types |
 | `‌‍`  | I/O     |
 | `​`  | Stack manipulation |
 | `‌​`  | Arithmetic |
