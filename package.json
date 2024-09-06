@@ -1,0 +1,26 @@
+{
+  "name": "nospace",
+  "version": "0.0.1",
+  "description": "Nospace is a superset of Whitespace that compiles to clean Whitespace output.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LeahHirst/nospace.git"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "files": [],
+  "author": "Leah Hirst",
+  "license": "MIT",
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.3",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/node": "^20.8.10"
+  }
+}
