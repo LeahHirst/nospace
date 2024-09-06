@@ -70,8 +70,8 @@ There are different types of commands in Nospace, and they all have different In
 
 | Commands | Parameters | Meaning |
 | - | - | - |
-| `[ZWNBSP]​` | Type | Casts the top item in the stack to the specified type | 
-| `[ZWNBSP]‌` | Type | Asserts that the top item in the stack is compatible with the specified type |
+| `⁠​` | Type | Casts the top item in the stack to the specified type | 
+| `⁠` | Type | Asserts that the top item in the stack is compatible with the specified type |
 
 
 ### Numbers
