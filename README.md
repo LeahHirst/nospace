@@ -44,6 +44,8 @@ As Whitespace is a stack based language, there may be situations where there are
 
 To achieve type checking, nospace uses a graph representation of effects performed on the stack to find effects which are not possible (subtracting an incompatible type from the stack). This allows for states produced from complex control flows to be typed consistently.
 
+Items stored and retrieved in the heap are untyped (i.e. have an `Any` type). Types can be assigned to them when retrieving them from the heap by using the Cast command.
+
 ## Roadmap
 
 - [ ] Useful error messaging - nospace will tell you that your program does not typecheck, but figuring out why is very difficult, particularly if your program has no width
