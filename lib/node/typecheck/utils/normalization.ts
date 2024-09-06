@@ -2,7 +2,7 @@ export const normalize = (whitespace: string) => whitespace
     .replace(/[\u200B ]/g, 's')
     .replace(/[\u200C\t]/g, 't')
     .replace(/[\u200D\n]/g, 'n')
-    .replace(/\uFEFF/g, 'x')
+    .replace(/\u2060/g, 'x')
     .replace(/[^stnx]/g, '');
 
 export const parseNumber = (normalized: string) => {
