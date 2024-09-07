@@ -1,0 +1,155 @@
+<style>
+  h1, h2 {
+    margin: 0;
+  }
+
+  .hero {
+    width: 100%;
+    background-color: #8331c6;
+    color: #fff;
+    padding: 50px 10px;
+    box-sizing: border-box;
+  }
+
+  .hero-inner {
+    display: flex;
+    gap: 50px;
+    flex-direction: row;
+    align-items: center;
+    margin: auto;
+    max-width: 1000px;
+    flex-wrap: wrap-reverse;
+  }
+
+  .hero-inner > div {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .hero-main h1 {
+    font-size: 2.5rem;
+    font-weight: 100;
+  }
+
+  .bold {
+    font-weight: 500;
+  }
+
+  .hero-main p {
+    font-size: 1.2rem;
+  }
+
+  .hero-main button {
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border: none;
+    border-radius: 0;
+    font-size: 1rem;
+    display: flex;
+  }
+
+  .hero-main button:hover {
+    background-color: #efefef;
+    cursor: pointer;
+  }
+
+  .hero-main button .button-primary-text {
+    font-weight: 400;
+  }
+
+  .hero-main button .button-secondary-text {
+    font-weight: 200;
+    font-size: 0.875rem;
+  }
+
+  .code-box {
+    border-radius: 8px;
+    border: 2px solid #a27fc9;
+    height: 200px;
+    background-color: #672397;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .code-box > .header {
+    border-bottom: solid 2px #a27fc9;
+    background-color: #8331c6;
+    padding: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+
+  .code-box > .code {
+    flex: 1;
+  }
+
+  .code-box > .output {
+    padding: 10px;
+    background-color: #531c79;
+    border-radius: 8px;
+  }
+
+  .code-box > .output > .output-title {
+    color: #adadad;
+    font-size: 0.875rem;
+    margin-bottom: 4px;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .button-icon {
+    width: 2px;
+    height: 100%;
+    border-left: solid 2px black;
+    height: 38px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 0.875rem;
+    padding-left: 0.875rem;
+  }
+</style>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-main">
+      <h1>Nospace is <span class="bold">Whitespace with syntax for types.</span>
+      <p>Nospace is a strongly typed esoteric programming language that builds on Whitespace, giving you better tooling at any scale.</p>
+      <button>
+        <div class="column">
+          <div class="button-primary-text">Try Nospace Now</div>
+          <div class="button-secondary-text">Online or via npm</div>
+        </div>
+        <div class="button-icon">
+          <svg width="22" height="6" viewBox="0 0 22 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_45_2)">
+              <circle cx="3" cy="3" r="2.5" stroke="black"/>
+              <circle cx="11" cy="3" r="2.5" stroke="black"/>
+              <circle cx="19" cy="3" r="2.5" stroke="black"/>
+            </g>
+            <defs>
+              <clipPath id="clip0_45_2">
+                <rect width="22" height="6" fill="white"/>
+              </clipPath>
+            </defs>
+          </svg>
+        </div>
+      </button>
+    </div>
+    <div>
+      <div class="code-box">
+        <div class="header">hello_world.ns</div>
+        <div class="code">​​​‌​​‌​​​‍‌‍​​​​​‌‌​​‌​‌‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​‌‌‌‌‍‌‍​​​​​‌​‌‌​​‍‌‍​​​​​‌​​​​​‍‌‍​​​​​‌‌‌​‌‌‌‍‌‍​​​​​‌‌​‌‌‌‌‍‌‍​​​​​‌‌‌​​‌​‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​​‌​​‍‌‍​​‍‍‍</div>
+        <div class="output">
+          <div class="output-title">Program output:</div>
+          &gt; Hello world
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
