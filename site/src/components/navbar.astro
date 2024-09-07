@@ -1,0 +1,38 @@
+---
+import Icon from './icon.astro';
+---
+
+
+<style>
+  nav {
+    background-color: #8331c6;
+    padding: 10px 30px;
+    color: white;
+  }
+
+  .container {
+
+  }
+
+  .logo {
+    max-height: 80px;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+</style>
+
+<nav>
+  <div class="container">
+    <div class="logo">
+      <Icon />
+      <span class="logo-text">nospace</span>
+    </div>
+  </div>
+</nav>
