@@ -1,0 +1,201 @@
+---
+import Shell from '../layouts/shell.astro';
+import Editor from '../components/editor.astro';
+import Chevron from '../components/chevron.astro';
+---
+
+<style>
+  .layout {
+    display: flex;
+    height: calc(100vh - 53px);
+    flex-direction: column;
+    overflow-y: hidden;
+    background-color: #1e1e1e;
+  }
+
+  .main-container {
+    display: flex;
+    flex: 1 1;
+  }
+
+  .editor-container {
+    flex: 1 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .subnav {
+    /* background-color: #5d1797; */
+    background-color: #2e2e2e;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #767676;
+  }
+
+  .subnav-actions {
+    display: flex;
+    flex: 0 1;
+    padding-right: 16px;
+  }
+
+  .subnav-action {
+    display: flex;
+    gap: 8px;
+    border-top: solid 2px transparent;
+    border-bottom: solid 2px transparent;
+    flex: 0 1;
+    padding: 16px 10px;
+    font-weight: 500;
+    align-items: center;
+  }
+
+  .subnav-action:hover {
+    background-color: #262626;
+    border-bottom: solid 2px white;
+    cursor: pointer;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 300;
+    padding: 10px 20px 10px 30px;
+  }
+
+  .toolbar {
+    background-color: #262626;
+    color: #c3c3c3;
+    padding: 10px 20px 10px 30px;
+    border-bottom: solid 5px #1e1e1e;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .toolbar-action {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: -10px;
+    padding: 10px;
+    border-bottom : solid 2px transparent;
+  }
+
+  .toolbar-action:hover {
+    background-color: #1e1e1e;
+    border-bottom: solid 2px white;
+    cursor: pointer;
+  }
+
+  .sidebar {
+    min-width: 200px;
+    width: 500px;
+    background-color: #262626;
+    color: white;
+    padding: 16px;
+    border-left: solid 3px #2f2f2f;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    overflow-y: scroll;
+    height: 100%;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  a {
+    color: white;
+  }
+
+  input, textarea {
+    background-color: #1e1e1e;
+    color: white;
+    padding: 8px;
+    font-size: 1rem;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 200px;
+  }
+
+  .tsc-logs {
+    min-height: 20px;
+    background-color: #1e1e1e;
+    padding: 8px;
+  }
+
+  .success {
+    color: #8ce08c;
+  }
+
+  .failure {
+    color: #e08c8c;
+  }
+
+  .subnav-left {
+    display: flex;
+    align-items: center;
+  }
+
+  a.active {
+    color: #d096ff;
+  }
+</style>
+
+<Shell title="Nospace: Playground">
+  
+  <div class="layout">
+    <nav class="subnav">
+      <div class="subnav-left">
+        <h1>Playground</h1>
+        <div class="subnav-actions">
+          <div class="subnav-action">
+            Examples
+            <Chevron />
+          </div>
+        </div>
+      </div>
+      <div class="subnav-actions">
+        <div class="subnav-action">Run</div>
+        <div class="subnav-action">Share</div>
+      </div>
+    </nav>
+    <div class="main-container">
+      <div class="editor-container">
+        <div class="toolbar">
+          <div>
+            View program in: <a class="active" href="#">Nospace</a> | <a href="#">Whitespace</a> | <a href="#">Nossembly</a>
+          </div>
+          <div class="toolbar-action">
+            Insert
+          </div>
+        </div>
+        <Editor client:load />
+      </div>
+      <div class="sidebar">
+        <div class="field">
+          Compiler output
+          <div class="tsc-logs success">
+            Success!
+          </div>
+        </div>
+        <div class="field">
+          Program input
+          <textarea></textarea>
+        </div>
+        <div class="field">
+          Program output
+          <textarea></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</Shell>

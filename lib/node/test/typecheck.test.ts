@@ -139,6 +139,16 @@ describe('Typechecker', () => {
       `)).toBeFalsy();
     });
 
+    it('Jump with empty branch works', () => {
+      expect(result(`
+        Jump A
+
+        Label A
+          Push 1
+          Assert Int
+      `)).toBeTruthy();
+    });
+
     it('types persist after Jump', () => {
       expect(result(`
         Push 1
@@ -181,6 +191,8 @@ describe('Typechecker', () => {
             Push 1
             Push 1
             JumpZero A
+            Push 1
+            Cast CustomType
             Jump B
 
             Label A
@@ -193,6 +205,8 @@ describe('Typechecker', () => {
 
             Label C
               Assert Int
+              Pop
+              Assert CustomType
           `)).toBeTruthy();
         });
       });
@@ -288,20 +302,70 @@ describe('Typechecker', () => {
     });
   });
 
-  // describe('Subroutines', () => {
-  //   it('subroutines apply types correctly', () => {
-  //     expect(result(`
-  //       Call A
-  //       Jump B
+  describe('Subroutines', () => {
+    it('subroutines apply types correctly outside of call', () => {
+      expect(result(`
+        Call A
+        Jump B
 
-  //       Label A
-  //         Push 1
-  //         Cast CustomA
-  //         Return
+        Label A
+          Push 1
+          Cast CustomA
+          Return
 
-  //       Label B
-  //         Assert CustomA
-  //     `, true)).toBeTruthy();
-  //   });
-  // });
+        Label B
+          Assert CustomA
+      `)).toBeTruthy();
+    });
+
+    it('nested subroutines apply types correctly outside of call', () => {
+      expect(result(`
+        Call A
+        Jump C
+
+        Label A
+          Push 1
+          Cast CustomA
+
+          Call B
+          Assert CustomB
+
+          Return
+
+        Label B
+          Cast CustomB
+
+        Label C
+          Assert CustomB
+      `)).toBeTruthy();
+    });
+
+    describe('calls into subroutines with union types', () => {
+      it('passes when asserting union type', () => {
+        const test = (type: string) => `
+          Push 1
+          JumpZero A
+          Jump B
+
+          Label A
+            Push 1
+            Cast CustomA
+            Jump C
+
+          Label B
+            Push 1
+            Cast CustomB
+            Jump C
+
+          Label C
+            Call D
+
+          Label D
+            Assert ${type}
+        `;
+        expect(result(test('CustomA'))).toBeTruthy();
+        expect(result(test('CustomB'))).toBeTruthy();
+      });
+    });
+  });
 });

@@ -1,0 +1,65 @@
+---
+import Shell from './shell.astro';
+import Chevron from '../components/chevron.astro';
+
+const { title, authorName, authorImage } = Astro.props;
+---
+
+<style>
+  article {
+    max-width: 1080px;
+    margin: auto;
+    margin-top: 50px;
+    padding: 20px;
+  }
+
+  h1 {
+    font-weight: 400;
+    font-size: 3rem;
+    margin: 10px 0;
+  }
+
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .breadcrumbs a {
+    text-decoration: none;
+    font-weight: 200;
+    color: #6e4c6f;
+  }
+
+  .author {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+  }
+
+  .author img {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+  }
+</style>
+
+<Shell title={`${title} - Nospace blog`}>
+  <article>
+    <div class="breadcrumbs">
+      <a href="/">Home</a>
+      <Chevron direction="right" color="#6e4c6f" height="5" />
+      <a href="#">Blog</a>
+    </div>
+    <h1>
+      {title}
+    </h1>
+    <div class="author">
+      <img src={authorImage} />
+      <div>{authorName}</div>
+    </div>
+    <slot />
+  </article>
+</Shell>

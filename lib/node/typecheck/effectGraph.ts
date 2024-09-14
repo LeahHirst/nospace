@@ -1,11 +1,11 @@
 import { Branch, StackEffect, Type } from "./interfaces";
 
-export type EffectGraphNode = {
-  effect: StackEffect;
+export type EffectGraphNode<T extends { effectType: string } = StackEffect> = {
+  effect: T;
   parents: Set<EffectGraphNode>;
   children: Set<EffectGraphNode>;
   propegate?: boolean;
-}
+};
 
 type NodeFragment = {
   head?: EffectGraphNode,
@@ -30,7 +30,7 @@ export function buildEffectGraph(branches: Branch[]) {
     }
 
     if (!fragment.head) {
-      return [...new Set(([branch.controlFlowBranch, branch.nextBranch]
+      return [...new Set(([branch.controlFlowBranch, branch.callsSubroutine ? undefined : branch.nextBranch]
         .filter(Boolean) as Branch[])
         .flatMap(x => getHeadNodes(x)))];
     }
@@ -55,16 +55,7 @@ export function buildEffectGraph(branches: Branch[]) {
 
   // Connect branches
   for (const branch of branches) {
-    if (branch.callsSubroutine || branch.returns) {
-      throw new Error('Not yet implemented');
-    }
-    
     const fragment = branchPointers.get(branch)!;
-
-    if (!fragment.tail) {
-      continue;
-    }
-
     const children = [
       branch.controlFlowBranch,
       branch.callsSubroutine ? undefined : branch.nextBranch,
@@ -72,9 +63,11 @@ export function buildEffectGraph(branches: Branch[]) {
       .filter(Boolean)
       .flatMap(x => getHeadNodes(x as Branch));
 
-    for (const child of children) {
-      fragment.tail.children.add(child);
-      child.parents.add(fragment.tail);
+    if (fragment.tail) {
+      for (const child of children) {
+        fragment.tail.children.add(child);
+        child.parents.add(fragment.tail);
+      }
     }
 
     if (branch.callsSubroutine && branch.nextBranch) {
@@ -100,7 +93,11 @@ export function buildEffectGraph(branches: Branch[]) {
   return baseNode;
 }
 
-function findReturns(branch: Branch, visited = new Set<Branch>()): Branch[] {
+function findReturns(branch?: Branch, visited = new Set<Branch>()): Branch[] {
+  if (!branch) {
+    return [];
+  }
+
   if (visited.has(branch)) {
     return [];
   }
@@ -111,7 +108,7 @@ function findReturns(branch: Branch, visited = new Set<Branch>()): Branch[] {
   }
 
   return [
-    ...findReturns(branch.controlFlowBranch!, visited),
-    ...findReturns(branch.nextBranch!, visited),
+    ...(branch.callsSubroutine ? [] : findReturns(branch.controlFlowBranch, visited)),
+    ...findReturns(branch.nextBranch, visited),
   ];
 }

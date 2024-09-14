@@ -1,3 +1,7 @@
+---
+import Chevron from './chevron.astro';
+---
+
 <style>
   h1, h2 {
     margin: 0;
@@ -18,12 +22,13 @@
     align-items: center;
     margin: auto;
     max-width: 1080px;
-    flex-wrap: wrap-reverse;
+    flex-wrap: wrap;
   }
 
   .hero-inner > div {
     flex: 1;
     min-width: 300px;
+    margin: 30px 0;
   }
 
   .hero-main h1 {
@@ -55,11 +60,11 @@
   }
 
   .hero-main button .button-primary-text {
-    font-weight: 400;
+    font-weight: 500;
   }
 
   .hero-main button .button-secondary-text {
-    font-weight: 200;
+    font-weight: 300;
     font-size: 0.875rem;
   }
 
@@ -76,8 +81,8 @@
     border-bottom: solid 2px #a27fc9;
     background-color: #8331c6;
     padding: 10px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
   }
 
   .code-box > .code {
@@ -87,13 +92,19 @@
   .code-box > .output {
     padding: 10px;
     background-color: #531c79;
-    border-radius: 8px;
+    border-radius: 6px;
   }
 
   .code-box > .output > .output-title {
     color: #adadad;
     font-size: 0.875rem;
     margin-bottom: 4px;
+  }
+
+  .code-box > .output > .output-result {
+    display: flex;
+    align-items: center;
+    gap: 1px;
   }
 
   .column {
@@ -145,10 +156,13 @@
     <div>
       <div class="code-box">
         <div class="header">hello_world.ns</div>
-        <div class="code">​​​‌​​‌​​​‍‌‍​​​​​‌‌​​‌​‌‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​‌‌‌‌‍‌‍​​​​​‌​‌‌​​‍‌‍​​​​​‌​​​​​‍‌‍​​​​​‌‌‌​‌‌‌‍‌‍​​​​​‌‌​‌‌‌‌‍‌‍​​​​​‌‌‌​​‌​‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​​‌​​‍‌‍​​‍‍‍</div>
+        <code class="code">​​​‌​​‌​​​‍‌‍​​​​​‌‌​​‌​‌‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​‌‌‌‌‍‌‍​​​​​‌​‌‌​​‍‌‍​​​​​‌​​​​​‍‌‍​​​​​‌‌‌​‌‌‌‍‌‍​​​​​‌‌​‌‌‌‌‍‌‍​​​​​‌‌‌​​‌​‍‌‍​​​​​‌‌​‌‌​​‍‌‍​​​​​‌‌​​‌​​‍‌‍​​‍‍‍</code>
         <div class="output">
           <div class="output-title">Program output:</div>
-          &gt; Hello world
+          <div class="output-result">
+            <Chevron direction="right" height="7" />
+            Hello world
+          </div>
         </div>
       </div>
     </div>
