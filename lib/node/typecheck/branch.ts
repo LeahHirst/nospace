@@ -18,7 +18,9 @@ export function extractBranches(operations: Operation[]) {
       case Instruction.Label: {
         const newBranch = branches.find(x => x.label === operation.argument)!;
         currentBranch.nextBranch = newBranch;
-        branches.push(currentBranch);
+        if (!currentBranch.label) {
+          branches.push(currentBranch);
+        }
         currentBranch = newBranch;
         continue;
       }
@@ -39,7 +41,7 @@ export function extractBranches(operations: Operation[]) {
           {
             effectType: 'subtract',
             type: Type.Int,
-          }
+          },
         );
         continue;
       }
@@ -48,7 +50,7 @@ export function extractBranches(operations: Operation[]) {
           {
             effectType: 'add',
             type: Type.Any,
-          }
+          },
         );
         continue;
       }
@@ -57,7 +59,7 @@ export function extractBranches(operations: Operation[]) {
           {
             effectType: 'subtract',
             type: Type.Any,
-          }
+          },
         );
         continue;
       }
@@ -66,7 +68,7 @@ export function extractBranches(operations: Operation[]) {
           {
             effectType: 'add',
             type: Type.Any,
-          }
+          },
         );
         continue;
       }
@@ -166,14 +168,18 @@ export function extractBranches(operations: Operation[]) {
         currentBranch.nextBranch = newBranch;
         currentBranch.controlFlowBranch = branches.find(branch => branch.label === operation.argument)!;
         currentBranch.callsSubroutine = true;
-        branches.push(currentBranch);
+        if (!currentBranch.label) {
+          branches.push(currentBranch);
+        }
         currentBranch = newBranch;
         continue;
       }
       case Instruction.Jump: {
         const labelledBranch = branches.find(branch => branch.label === operation.argument)!;
         currentBranch.nextBranch = labelledBranch;
-        branches.push(currentBranch);
+        if (!currentBranch.label) {
+          branches.push(currentBranch);
+        }
         currentBranch = {
           effects: [],
         };
@@ -191,13 +197,17 @@ export function extractBranches(operations: Operation[]) {
           effects: [],
         };
         currentBranch.nextBranch = newBranch;
-        branches.push(currentBranch);
+        if (!currentBranch.label) {
+          branches.push(currentBranch);
+        }
         currentBranch = newBranch;
         continue;
       }
       case Instruction.Return: {
         currentBranch.returns = true;
-        branches.push(currentBranch);
+        if (!currentBranch.label) {
+          branches.push(currentBranch);
+        }
         currentBranch = {
           effects: [],
         };
@@ -216,7 +226,9 @@ export function extractBranches(operations: Operation[]) {
         continue;
       }
       case Instruction.End: {
-        branches.push(currentBranch);
+        if (!currentBranch.label) {
+          branches.push(currentBranch);
+        }
         currentBranch = {
           effects: [],
         };
@@ -246,6 +258,8 @@ export function extractBranches(operations: Operation[]) {
       }
     }
   }
-  branches.push(currentBranch);
+  if (!currentBranch.label) {
+    branches.push(currentBranch);
+  }
   return branches;
 }

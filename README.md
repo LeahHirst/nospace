@@ -8,7 +8,7 @@
 
 Nospace is an [esoteric programming language](https://en.wikipedia.org/wiki/Esoteric_programming_language) for application-scale [Whitespace](https://esolangs.org/wiki/Whitespace). Nospace adds optional types to Whitespace that support tools for large-scale Whitespace applications. Nospace compiles to readable, standards-based Whitespace.
 
-In addition to types, Nospace provides lexical aliasing of spaces with zero-width spaces (`​`), tabs with zero-width non-joiners (`‌`), and feed lines with zero-width joiners (`‍`). These changes allow for the creation of zero-width, single lined programs for improved readability.
+In addition to types, Nospace provides lexical aliasing of spaces with zero-width spaces (`​`), tabs with zero-width non-joiners (`‌`), and feed lines with zero-width joiners (`‍`). These changes allow for the creation of zero-width, single lined programs for worsened readability.
 
 ## Hello world
 The following is a simple hello world program in Nospace:
@@ -33,10 +33,10 @@ Nospace provides a static-type checker which helps to ensure your programs are f
 
 There are 4 primitive types provided by nospace, however you may also specify your own. The primative types are:
 
-- `Any` (`‌​‍`; ZWNJ + ZWSP + ZWJ),
-- `Never` (`‌‌‍`; ZWNJ + ZWNJ + ZWJ),
-- `Int` (`​​‍`; ZWSP + ZWSP + ZWJ),
-- `Char` (`​‌‍`; ZWSP + ZWNJ + ZWJ)
+- `Any` (`‌​‍`),
+- `Never` (`‌‌‍`),
+- `Int` (`​​‍`),
+- `Char` (`​‌‍`)
 
 `Any` is compatible with all types. When an item is pushed to the stack, it defaults to the Any type. Assertions will always succeed when the top item of the stack has an `Any` type.
 

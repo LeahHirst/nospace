@@ -73,10 +73,21 @@ export type AssertEffect = {
   type: Type | string;
 };
 
+export type CopyEffect = {
+  effectType: 'copy';
+  index: number;
+};
+
+export type SwapEffect = {
+  effectType: 'swap';
+};
+
 export type StackEffect = 
  | AddEffect
  | SubtractEffect
- | AssertEffect;
+ | AssertEffect
+ | CopyEffect
+ | SwapEffect;
 
 export type Branch = {
   label?: string;
