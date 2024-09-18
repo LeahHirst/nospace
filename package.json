@@ -1,31 +1,25 @@
 {
   "name": "nospace",
-  "version": "0.0.1",
-  "description": "Nospace is a superset of Whitespace that compiles to clean Whitespace output.",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/LeahHirst/nospace.git"
-  },
-  "scripts": {
-    "test": "jest"
-  },
-  "files": [],
-  "author": "Leah Hirst",
   "license": "MIT",
-  "devDependencies": {
-    "@tsconfig/recommended": "^1.0.3",
-    "@types/jest": "^29.5.12",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.2.5",
-    "typescript": "^5.2.2"
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
-  "dependencies": {
-    "@astrojs/react": "^3.6.2",
-    "@types/node": "^20.8.10",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  }
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "turbo": "^2.1.2",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "yarn@1.22.19",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
