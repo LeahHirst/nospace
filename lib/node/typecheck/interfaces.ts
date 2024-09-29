@@ -96,4 +96,4 @@ export type Branch = {
   controlFlowBranch?: Branch;
   callsSubroutine?: boolean;
   returns?: boolean;
-}
+};

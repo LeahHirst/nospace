@@ -1,9 +1,6 @@
 import { Instruction } from "./interfaces";
 
-export const ParameterizedInstructions: Instruction[] = [
-  Instruction.Push,
-  Instruction.Copy,
-  Instruction.Slide,
+export const LabelledInstructions = [
   Instruction.Label,
   Instruction.Call,
   Instruction.Jump,
@@ -11,10 +8,10 @@ export const ParameterizedInstructions: Instruction[] = [
   Instruction.JumpNegative,
   Instruction.Cast,
   Instruction.Assert,
-];
+] as const;
 
-export const NumericParameterizedInstructions: Instruction[] = [
+export const NumericInstructions = [
   Instruction.Push,
   Instruction.Copy,
   Instruction.Slide,
-];
+] as const;

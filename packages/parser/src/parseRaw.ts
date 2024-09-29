@@ -1,5 +1,4 @@
-import { NumericParameterizedInstructions, ParameterizedInstructions } from "./const";
-import { Instruction, Operation, ProgramArgs, TokenMap } from "./interfaces";
+import { Instruction, Operation, IRArgs, TokenMap, isNumericInstruction, isLabelledInstruction } from "./interfaces";
 
 function normalize(raw: string, ignoreNospace = false): string {
   const normalized = raw
@@ -46,7 +45,7 @@ function generateToken(n: number) {
     .join('');
 }
 
-export function parseRaw(raw: string, ignoreNospace = false): ProgramArgs {
+export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
   const normalized = normalize(raw, ignoreNospace);
 
   const operations: Operation[] = [];
@@ -54,18 +53,48 @@ export function parseRaw(raw: string, ignoreNospace = false): ProgramArgs {
   let instruction: Instruction | undefined = undefined;
   let buf: string = '';
   let parsingArg = false;
+  let startLn = 1;
+  let ln = 1;
+  let startCol = 1; 
+  let col = 1;
   for (const char of normalized) {
     buf += char;
+    if (char === 'n') {
+      ln++;
+      col = 1;
+    } else {
+      col++;
+    }
 
     if (parsingArg) {
       if (char === 'n') {
         if (instruction) {
-          const tokenizedArg = !NumericParameterizedInstructions.includes(instruction);
-          operations.push({ instruction, argument: tokenizedArg ? (tokens.get(buf) ?? buf) : buf });
-
-          if (!NumericParameterizedInstructions.includes(instruction)) {
-            tokens.set(generateToken(tokens.size), buf);
+          const meta = {
+            startLn,
+            startCol,
+            endCol: col,
+            endLn: ln,
+          };
+          if (isNumericInstruction(instruction)) {
+            operations.push({
+              instruction,
+              argument: parseNumber(buf),
+              meta,
+            });
+          } else if (isLabelledInstruction(instruction)) {
+            const token = Array.from(tokens.entries()).find(([_, v]) => v === buf)?.[0] ?? generateToken(tokens.size);
+            if (!tokens.has(token)) {
+              tokens.set(token, buf);
+            }
+            operations.push({
+              instruction,
+              argument: token,
+              meta,
+            });
           }
+
+          startLn = ln;
+          startCol = col;
         }
         buf = '';
         parsingArg = false;
@@ -74,13 +103,24 @@ export function parseRaw(raw: string, ignoreNospace = false): ProgramArgs {
       if (Object.values(Instruction).includes(buf as Instruction)) {
         instruction = buf as Instruction;
         buf = '';
-        if (ParameterizedInstructions.includes(instruction)) {
+        if (isNumericInstruction(instruction) || isLabelledInstruction(instruction)) {
           parsingArg = true;
         } else {
-          operations.push({ instruction });
+          operations.push({
+            instruction,
+            argument: undefined,
+            meta: {
+              startLn,
+              startCol,
+              endCol: col,
+              endLn: ln,
+            },
+          });
+          startLn = ln;
+          startCol = col;
         }
       }
-      
+
       if (buf.length > 4) {
         throw new Error(`Unrecognized instruction: ${buf}`);
       }

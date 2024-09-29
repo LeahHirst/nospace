@@ -1,4 +1,4 @@
-import { Instruction, ProgramArgs } from "../interfaces";
+import { Instruction, IRArgs } from "../interfaces";
 import { parseRaw } from "../parseRaw";
 
 const allInstructions = 'tntstntttnsstnstssststnsnssntsnnstsststnstnststntssstssttssntstststtnssststnnstststnnsnststnntsststnnttststnntnnnnttsttt';
