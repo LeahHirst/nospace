@@ -1,7 +1,7 @@
-import { IRArgs, Instruction, Operation, TokenMap, isNumericInstruction } from "./interfaces";
+import { IRArgs, Instruction, Operation, TokenMap, isLabeledOperation, isNumericInstruction, isNumericOperation } from "./interfaces";
 import { parseNossembly } from "./parseNossembly";
 import { parseRaw } from "./parseRaw";
-import { parseNumber } from "./utils";
+import { serializeNumber } from "./utils";
 
 export class NospaceIR {
   public readonly operations: Operation[];
@@ -23,7 +23,6 @@ export class NospaceIR {
 
     for (const op of this.operations) {
       const name = instructionNames[op.instruction];
-      const normalizedArg = this.normalizeArgument(op.instruction, op.argument as string);
 
       if (op.instruction === Instruction.Label) {
         indent = true;
@@ -32,7 +31,7 @@ export class NospaceIR {
         }
       }
       const prefix = (indent && op.instruction !== Instruction.Label) ? '  ' : ''
-      lines.push([prefix, name, normalizedArg].filter(Boolean).join(' '));
+      lines.push([prefix, name, op.argument].filter(Boolean).join(' '));
     }
 
     return lines.join('\n');
@@ -44,7 +43,7 @@ export class NospaceIR {
         Instruction.Cast,
         Instruction.Assert
       ].includes(x.instruction))
-      .map(x => [x.instruction, x.argument].filter(Boolean).join(''))
+      .map(x => this.normalizeOperation(x).filter(Boolean).join(''))
       .join('')
       .replace(/s/g, ' ')
       .replace(/t/g, '\t')
@@ -53,7 +52,7 @@ export class NospaceIR {
 
   toNospace() {
     return this.operations
-      .map(x => [x.instruction, x.argument].filter(Boolean).join(''))
+      .map(x => this.normalizeOperation(x).filter(Boolean).join(''))
       .join('')
       .replace(/s/g, '\u200B')
       .replace(/t/g, '\u200C')
@@ -76,14 +75,16 @@ export class NospaceIR {
     return new NospaceIR(args);
   }
 
-  private normalizeArgument(instruction: Instruction, arg: string) {
-    if (isNumericInstruction(instruction)) {
-      return parseNumber(arg);
-    } else {
-      return Object.fromEntries(
-        Array.from(this.tokens.entries()).map(([k, v]) => [v, k])
-      )[arg as string] ?? arg;
+  private normalizeOperation(operation: Operation): [Instruction, string | undefined] {
+    if (isNumericOperation(operation)) {
+      return [operation.instruction, serializeNumber(operation.argument)];
     }
+
+    if (isLabeledOperation(operation)) {
+      return [operation.instruction, this.tokens.get(operation.argument)];
+    }
+
+    return [operation.instruction, undefined];
   }
 }
 
