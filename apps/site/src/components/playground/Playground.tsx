@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import Header from './Header';
+import Editor from './Editor';
 
 const Container = styled.div`
   display: flex;
@@ -10,13 +11,11 @@ const Container = styled.div`
   background-color: #1e1e1e;
 `
 
-export function Playground() {
-
-
+export default function Playground() {
   return (
     <Container>
       <Header />
-
+      <Editor />
     </Container>
   )
 }

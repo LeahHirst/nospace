@@ -40,12 +40,22 @@ import Chevron from './chevron.astro';
     font-weight: 500;
   }
 
+  .hero-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: flex-start;
+  }
+
   .hero-main p {
     font-size: 1.2rem;
     font-weight: 200;
+    margin: 0;
   }
 
-  .hero-main button {
+  .hero-main a {
+    color: black;
+    text-decoration: none;
     padding: 0.5rem 1rem;
     background-color: white;
     border: none;
@@ -54,16 +64,16 @@ import Chevron from './chevron.astro';
     display: flex;
   }
 
-  .hero-main button:hover {
+  .hero-main a:hover {
     background-color: #efefef;
     cursor: pointer;
   }
 
-  .hero-main button .button-primary-text {
+  .hero-main a .button-primary-text {
     font-weight: 500;
   }
 
-  .hero-main button .button-secondary-text {
+  .hero-main a .button-secondary-text {
     font-weight: 300;
     font-size: 0.875rem;
   }
@@ -132,10 +142,10 @@ import Chevron from './chevron.astro';
     <div class="hero-main">
       <h1><span class="bold">The best software is invisible,</span><br />as should your code be.</h1>
       <p>Nospace is a strongly typed esoteric programming language that builds on Whitespace, giving you better tooling at any scale.</p>
-      <button>
+      <a href="/play">
         <div class="column">
           <div class="button-primary-text">Try Nospace Now</div>
-          <div class="button-secondary-text">Online or via npm</div>
+          <div class="button-secondary-text">In your browser</div>
         </div>
         <div class="button-icon">
           <svg width="22" height="6" viewBox="0 0 22 6" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -151,7 +161,7 @@ import Chevron from './chevron.astro';
             </defs>
           </svg>
         </div>
-      </button>
+      </a>
     </div>
     <div>
       <div class="code-box">

@@ -1,24 +1,25 @@
 {
-  "name": "@repo/parser",
-  "private": true,
+  "name": "@repo/language-support",
   "version": "0.0.0",
   "exports": {
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "jest",
     "lint": "eslint . --max-warnings 0"
   },
+  "type": "module",
   "devDependencies": {
     "@repo/eslint-config": "*",
+    "@repo/parser": "*",
     "@repo/typescript-config": "*",
     "@turbo/gen": "^1.12.4",
     "@types/eslint": "^8.56.5",
-    "@types/jest": "^29.5.13",
     "@types/node": "^20.11.24",
     "eslint": "^8.57.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.2.5",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "@monaco-editor/react": "^4.6.0"
   }
 }
