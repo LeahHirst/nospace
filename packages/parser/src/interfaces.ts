@@ -87,3 +87,11 @@ export function isNumericInstruction(instruction: Instruction): instruction is t
 export function isLabelledInstruction(instruction: Instruction): instruction is typeof LabelledInstructions[number] {
   return LabelledInstructions.includes(instruction as any);
 };
+
+export function isNumericOperation(operation: Operation): operation is NumericOperation {
+  return isNumericInstruction(operation.instruction);
+}
+
+export function isLabeledOperation(operation: Operation): operation is LabeledOperation {
+  return isLabelledInstruction(operation.instruction);
+}
