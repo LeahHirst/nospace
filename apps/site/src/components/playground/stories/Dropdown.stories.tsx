@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from '@storybook/react';
 
-import Dropdown, { DropdownAction } from "../Dropdown";
+import Dropdown, { DropdownAction } from '../Dropdown';
 
 function WrappedDropdown() {
   return (
-    <div style={{ backgroundColor: "black" }}>
+    <div style={{ backgroundColor: 'black' }}>
       <Dropdown label="Insert">
         <DropdownAction>ZWSP</DropdownAction>
         <DropdownAction>ZWNJ</DropdownAction>
@@ -16,14 +16,14 @@ function WrappedDropdown() {
 }
 
 const meta = {
-  title: "Playground/Dropdown",
+  title: 'Playground/Dropdown',
   component: WrappedDropdown,
   parameters: {
-    layout: "centered",
+    layout: 'centered',
   },
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   argTypes: {},
-  args: { label: "Insert" },
+  args: { label: 'Insert' },
 } satisfies Meta<typeof Dropdown>;
 
 export default meta;

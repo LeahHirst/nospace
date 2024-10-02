@@ -1,31 +1,31 @@
 export enum Instruction {
-  ReadChar = "tnts",
-  ReadInt = "tntt",
-  WriteChar = "tnss",
-  WriteInt = "tnst",
-  Push = "ss",
-  Duplicate = "sns",
-  Swap = "snt",
-  Pop = "snn",
-  Copy = "sts",
-  Slide = "stn",
-  Add = "tsss",
-  Subtract = "tsst",
-  Multiply = "tssn",
-  Divide = "tsts",
-  Mod = "tstt",
-  Label = "nss",
-  Call = "nst",
-  Jump = "nsn",
-  JumpZero = "nts",
-  JumpNegative = "ntt",
-  Return = "ntn",
-  End = "nnn",
-  Store = "tts",
-  Retrieve = "ttt",
-  Cast = "xs",
-  Assert = "xt",
-  Unknown = "unknown",
+  ReadChar = 'tnts',
+  ReadInt = 'tntt',
+  WriteChar = 'tnss',
+  WriteInt = 'tnst',
+  Push = 'ss',
+  Duplicate = 'sns',
+  Swap = 'snt',
+  Pop = 'snn',
+  Copy = 'sts',
+  Slide = 'stn',
+  Add = 'tsss',
+  Subtract = 'tsst',
+  Multiply = 'tssn',
+  Divide = 'tsts',
+  Mod = 'tstt',
+  Label = 'nss',
+  Call = 'nst',
+  Jump = 'nsn',
+  JumpZero = 'nts',
+  JumpNegative = 'ntt',
+  Return = 'ntn',
+  End = 'nnn',
+  Store = 'tts',
+  Retrieve = 'ttt',
+  Cast = 'xs',
+  Assert = 'xt',
+  Unknown = 'unknown',
 }
 
 export const LabelledInstructions = [
@@ -34,8 +34,6 @@ export const LabelledInstructions = [
   Instruction.Jump,
   Instruction.JumpZero,
   Instruction.JumpNegative,
-  Instruction.Cast,
-  Instruction.Assert,
 ] as const;
 
 export const NumericInstructions = [
@@ -44,7 +42,9 @@ export const NumericInstructions = [
   Instruction.Slide,
 ] as const;
 
-export type OperationMeta = {
+export const TypeInstructions = [Instruction.Cast, Instruction.Assert] as const;
+
+export type CodeRange = {
   startLn: number;
   endLn: number;
   startCol: number;
@@ -55,12 +55,12 @@ type OperationBase<I extends Instruction, A = undefined> = A extends undefined
   ? {
       instruction: I;
       argument?: A;
-      meta?: OperationMeta;
+      meta: CodeRange;
     }
   : {
       instruction: I;
       argument: A;
-      meta?: OperationMeta;
+      meta: CodeRange;
     };
 
 export type NumericOperation = OperationBase<
@@ -73,38 +73,46 @@ export type LabeledOperation = OperationBase<
   string
 >;
 
-type ParameterizedInstruction = NumericOperation | LabeledOperation;
+export type TypeOperation = OperationBase<
+  (typeof TypeInstructions)[number],
+  string
+>;
+
+type ParameterizedInstruction =
+  | NumericOperation
+  | LabeledOperation
+  | TypeOperation;
 
 export type Operation =
   | ParameterizedInstruction
   | OperationBase<
-      Exclude<Instruction, ParameterizedInstruction["instruction"]>
+      Exclude<Instruction, ParameterizedInstruction['instruction']>
     >;
 
 type Error = {
   message: string;
-  meta: OperationMeta;
+  meta: CodeRange;
 };
 
 export type UnknownInstructionError = Error & {
-  type: "unknown_instruction";
+  type: 'unknown_instruction';
 };
 
 export type ArgumentError = Error & {
-  type: "argument";
+  type: 'argument';
 };
 
 export type PragmaError = Error & {
-  type: "pragma";
+  type: 'pragma';
 };
 
 export type ParseError = UnknownInstructionError | ArgumentError | PragmaError;
 
 export enum Type {
-  Never = "ttn",
-  Any = "tsn",
-  Int = "ssn",
-  Char = "stn",
+  Never = 'ttn',
+  Any = 'tsn',
+  Int = 'ssn',
+  Char = 'stn',
 }
 
 export type TokenMap = Map<string, string>;
@@ -127,6 +135,12 @@ export function isLabelledInstruction(
   return LabelledInstructions.includes(instruction as any);
 }
 
+export function isTypeInstruction(
+  instruction: Instruction,
+): instruction is (typeof TypeInstructions)[number] {
+  return TypeInstructions.includes(instruction as any);
+}
+
 export function isNumericOperation(
   operation: Operation,
 ): operation is NumericOperation {
@@ -137,4 +151,10 @@ export function isLabeledOperation(
   operation: Operation,
 ): operation is LabeledOperation {
   return isLabelledInstruction(operation.instruction);
+}
+
+export function isTypeOperation(
+  operation: Operation,
+): operation is TypeOperation {
+  return isTypeInstruction(operation.instruction);
 }

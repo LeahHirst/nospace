@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import Button from "./Button";
-import styled from "@emotion/styled";
-import { Chevron } from "./icons/Chevron";
+import React, { useState } from 'react';
+import Button from './Button';
+import styled from '@emotion/styled';
+import { Chevron } from './icons/Chevron';
 
 const DropdownContent = styled.div`
   position: absolute;
@@ -39,7 +39,7 @@ export default function Dropdown({ label, children }: DropdownProps) {
     <div>
       <Button onClick={() => setShow(!show)}>
         {label}
-        <Chevron direction={show ? "up" : "down"} />
+        <Chevron direction={show ? 'up' : 'down'} />
       </Button>
       {show && <DropdownContent>{children}</DropdownContent>}
     </div>

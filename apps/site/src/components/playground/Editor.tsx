@@ -1,15 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
-import styled from "@emotion/styled";
-import { NospaceIR } from "@repo/parser";
-import Button from "./Button";
-import Dropdown, { DropdownAction } from "./Dropdown";
+import React, { useEffect, useMemo, useState } from 'react';
+import { Editor as MonacoEditor, useMonaco } from '@monaco-editor/react';
+import styled from '@emotion/styled';
+import { NospaceIR } from '@repo/parser';
+import Button from './Button';
+import Dropdown, { DropdownAction } from './Dropdown';
 import {
   registerNospace,
   registerWhitespace,
   registerNossembly,
-} from "@repo/language-support";
-import type { editor } from "monaco-editor";
+} from '@repo/language-support';
+import type { editor } from 'monaco-editor';
+import { Typechecker } from '@repo/typecheck/index';
 
 const Container = styled.div`
   display: flex;
@@ -42,33 +43,33 @@ Label Test
 
 function getProgram(lang: string, code: string) {
   switch (lang) {
-    case "Nospace":
+    case 'Nospace':
       return NospaceIR.fromNospace(code);
-    case "Whitespace":
+    case 'Whitespace':
       return NospaceIR.fromWhitespace(code);
-    case "Nossembly":
+    case 'Nossembly':
       return NospaceIR.fromNossembly(code);
     default:
-      throw new Error("Unrecognized language");
+      throw new Error('Unrecognized language');
   }
 }
 
 function serializeProgram(lang: string, prog: NospaceIR) {
   switch (lang) {
-    case "Nospace":
+    case 'Nospace':
       return prog.toNospace();
-    case "Whitespace":
+    case 'Whitespace':
       return prog.toWhitespace();
-    case "Nossembly":
+    case 'Nossembly':
       return prog.toNossembly();
     default:
-      throw new Error("Unrecognized language");
+      throw new Error('Unrecognized language');
   }
 }
 
 export default function Editor() {
   const monaco = useMonaco();
-  const [language, setLanguage] = useState("Nospace");
+  const [language, setLanguage] = useState('Nospace');
   const [[lnNumber, colNumber], setCursorPos] = useState([1, 1]);
 
   useEffect(() => {
@@ -82,7 +83,7 @@ export default function Editor() {
     registerWhitespace(monaco);
     registerNossembly(monaco);
 
-    monaco.editor.setModelLanguage(editor.getModel()!, "nossembly");
+    monaco.editor.setModelLanguage(editor.getModel()!, 'nossembly');
   }, [monaco]);
 
   const highlightErrors = React.useCallback(
@@ -95,34 +96,48 @@ export default function Editor() {
 
       // Todo: debounce
       const parsed = getProgram(lang, editor.getValue());
-      monaco.editor.setModelMarkers(editor.getModel()!, "owner", []);
-      monaco.editor.setModelMarkers(
-        editor.getModel()!,
-        "owner",
-        parsed.parseErrors.map((error) => ({
-          startLineNumber: error.meta.startLn + 1,
-          endLineNumber: error.meta.endLn + 1,
-          startColumn: error.meta.startCol + 1,
-          endColumn: error.meta.endCol + 1,
-          message: `ParseError: ${error.message}`,
-          severity: monaco.MarkerSeverity.Error,
-        })),
-      );
+      const markers: editor.IMarkerData[] = parsed.parseErrors.map((error) => ({
+        startLineNumber: error.meta.startLn + 1,
+        endLineNumber: error.meta.endLn + 1,
+        startColumn: error.meta.startCol + 1,
+        endColumn: error.meta.endCol + 1,
+        message: `ParseError: ${error.message}`,
+        severity: monaco.MarkerSeverity.Error,
+      }));
+
+      const [typechecked, typeErrors] = new Typechecker(parsed).typecheck();
+      if (!typechecked) {
+        for (const error of typeErrors.errors) {
+          markers.push({
+            startLineNumber: error.meta.startLn + 1,
+            endLineNumber: error.meta.endLn + 1,
+            startColumn: error.meta.startCol + 1,
+            endColumn: error.meta.endCol + 1,
+            message: `TypeError: ${error.message}`,
+            severity: monaco.MarkerSeverity.Error,
+          });
+        }
+      }
+
+      monaco.editor.setModelMarkers(editor.getModel()!, 'owner', markers);
     },
-    [monaco, language],
+    [monaco],
   );
 
   React.useEffect(() => {
     if (!monaco) {
-      return;
+      return () => {};
     }
 
     const editor = monaco.editor.getEditors()[0];
 
-    editor.onDidChangeCursorPosition((e) => {
+    const cleanup = editor.onDidChangeCursorPosition((e) => {
       setCursorPos([e.position.lineNumber, e.position.column]);
       highlightErrors(language);
     });
+    return () => {
+      cleanup.dispose();
+    };
   }, [monaco, language, highlightErrors]);
 
   const changeLanguage = React.useCallback(
@@ -132,11 +147,11 @@ export default function Editor() {
       }
 
       const editor = monaco.editor.getEditors()[0];
-      const program = getProgram(language, editor.getValue());
+      const program = getProgram(lang, editor.getValue());
       editor.setValue(serializeProgram(lang, program));
       setLanguage(lang);
     },
-    [monaco, language],
+    [monaco],
   );
 
   const insert = React.useCallback(
@@ -146,7 +161,7 @@ export default function Editor() {
       }
 
       const editor = monaco.editor.getEditors()[0];
-      editor.executeEdits("nospace", [
+      editor.executeEdits('nospace', [
         {
           range: new monaco.Range(lnNumber, colNumber, lnNumber, colNumber),
           text,
@@ -165,7 +180,7 @@ export default function Editor() {
         fontFamily: 'monaco, Consolas, "Lucida Console", monospace',
         tabSize: 2,
         language,
-        autoIndent: "none",
+        autoIndent: 'none',
         renderControlCharacters: false,
         unicodeHighlight: {
           invisibleCharacters: false,
@@ -181,7 +196,7 @@ export default function Editor() {
     <Container>
       <Toolbar>
         <Flex>
-          {["Nospace", "Whitespace", "Nossembly"].map((lang) => (
+          {['Nospace', 'Whitespace', 'Nossembly'].map((lang) => (
             <Button
               key={lang}
               active={language === lang}
@@ -192,8 +207,8 @@ export default function Editor() {
                   lang.toLowerCase(),
                 );
                 editor?.updateOptions({
-                  autoIndent: lang === "Nossembly" ? "advanced" : "none",
-                  fontSize: lang === "Nossembly" ? 16.0001 : 16, // horrible hack to force Monaco to update options immediately
+                  autoIndent: lang === 'Nossembly' ? 'advanced' : 'none',
+                  fontSize: lang === 'Nossembly' ? 16.0001 : 16, // horrible hack to force Monaco to update options immediately
                 });
                 changeLanguage(lang);
                 highlightErrors(lang);
@@ -205,16 +220,16 @@ export default function Editor() {
         </Flex>
         <Flex>
           <Dropdown label="Insert">
-            <DropdownAction onClick={() => insert("\u200B")}>
+            <DropdownAction onClick={() => insert('\u200B')}>
               ZWSP
             </DropdownAction>
-            <DropdownAction onClick={() => insert("\u200C")}>
+            <DropdownAction onClick={() => insert('\u200C')}>
               ZWNJ
             </DropdownAction>
-            <DropdownAction onClick={() => insert("\u200D")}>
+            <DropdownAction onClick={() => insert('\u200D')}>
               ZWJ
             </DropdownAction>
-            <DropdownAction onClick={() => insert("\u2060")}>WJ</DropdownAction>
+            <DropdownAction onClick={() => insert('\u2060')}>WJ</DropdownAction>
           </Dropdown>
         </Flex>
       </Toolbar>

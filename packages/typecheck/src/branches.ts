@@ -1,5 +1,5 @@
-import { Instruction, Operation } from "@repo/parser";
-import { Branch } from "./interfaces";
+import { Instruction, type Operation } from '@repo/parser';
+import type { Branch } from './interfaces';
 
 export function extractBranches(operations: Operation[]): Branch[] {
   let currentBranch: Branch = {
@@ -13,7 +13,7 @@ export function extractBranches(operations: Operation[]): Branch[] {
       operations: [],
     }));
 
-  const branches: Branch[] = [currentBranch];
+  const branches: Branch[] = [];
 
   for (const operation of operations) {
     switch (operation.instruction) {
@@ -29,13 +29,21 @@ export function extractBranches(operations: Operation[]): Branch[] {
       case Instruction.Call: {
         const newBranch = {
           operations: [],
-          callsSubroutine: true,
         };
         currentBranch.nextBranch = newBranch;
         currentBranch.controlFlowBranch = labelledBranches.find(
           (branch) => branch.label === operation.argument,
         );
         currentBranch.callsSubroutine = true;
+        branches.push(currentBranch);
+        currentBranch = newBranch;
+        break;
+      }
+      case Instruction.Return: {
+        const newBranch = {
+          operations: [],
+        };
+        currentBranch.returns = true;
         branches.push(currentBranch);
         currentBranch = newBranch;
         break;
@@ -57,7 +65,16 @@ export function extractBranches(operations: Operation[]): Branch[] {
           (branch) => branch.label === operation.argument,
         );
         currentBranch.operations.push(operation);
-        currentBranch.nextBranch = labelledBranch;
+        currentBranch.controlFlowBranch = labelledBranch;
+        const newBranch = {
+          operations: [],
+        };
+        currentBranch.nextBranch = newBranch;
+        branches.push(currentBranch);
+        currentBranch = newBranch;
+        break;
+      }
+      case Instruction.End: {
         branches.push(currentBranch);
         currentBranch = {
           operations: [],
@@ -70,6 +87,8 @@ export function extractBranches(operations: Operation[]): Branch[] {
       }
     }
   }
+
+  branches.push(currentBranch);
 
   return branches;
 }

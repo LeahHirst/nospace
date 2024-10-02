@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "@emotion/styled";
-import Dropdown, { DropdownAction } from "./Dropdown";
-import Button from "./Button";
+import React from 'react';
+import styled from '@emotion/styled';
+import Dropdown, { DropdownAction } from './Dropdown';
+import Button from './Button';
 
 const Base = styled.nav`
   background-color: #2e2e2e;

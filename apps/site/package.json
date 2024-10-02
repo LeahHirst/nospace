@@ -19,6 +19,7 @@
     "@emotion/styled": "^11.13.0",
     "@monaco-editor/react": "^4.6.0",
     "@repo/parser": "*",
+    "@repo/typecheck": "*",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.0",
