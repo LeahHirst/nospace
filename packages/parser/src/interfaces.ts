@@ -25,6 +25,7 @@ export enum Instruction {
   Retrieve = 'ttt',
   Cast = 'xs',
   Assert = 'xt',
+  Unknown = 'unknown',
 };
 
 export const LabelledInstructions = [
@@ -66,6 +67,29 @@ export type Operation =
   | ParameterizedInstruction
   | OperationBase<Exclude<Instruction, ParameterizedInstruction['instruction']>>;
 
+type Error = {
+  message: string;
+  meta: OperationMeta; 
+};
+
+export type UnknownInstructionError = Error & {
+  type: 'unknown_instruction';
+
+};
+
+export type ArgumentError = Error & {
+  type: 'argument'
+};
+
+export type PragmaError = Error & {
+  type: 'pragma';
+};
+
+export type ParseError =
+  | UnknownInstructionError
+  | ArgumentError
+  | PragmaError;
+
 export enum Type {
   Never = 'ttn',
   Any = 'tsn',
@@ -78,6 +102,7 @@ export type TokenMap = Map<string, string>;
 export type IRArgs = {
   operations: Operation[];
   tokens: TokenMap;
+  parseErrors: ParseError[];
 };
 
 export function isNumericInstruction(instruction: Instruction): instruction is typeof NumericInstructions[number] {
