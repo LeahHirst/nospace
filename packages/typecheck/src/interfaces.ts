@@ -1,34 +1,34 @@
 import { Operation } from "@repo/parser";
 
 export enum Type {
-  Never = 'ttn',
-  Any = 'tsn',
-  Int = 'ssn',
-  Char = 'stn',
+  Never = "ttn",
+  Any = "tsn",
+  Int = "ssn",
+  Char = "stn",
 }
 
 export type PushEffect = {
-  effectType: 'push';
+  effectType: "push";
   type: Type | string;
 };
 
 export type PopEffect = {
-  effectType: 'pop';
+  effectType: "pop";
   type: Type | string;
 };
 
 export type AssertEffect = {
-  effectType: 'assert';
+  effectType: "assert";
   type: Type | string;
 };
 
 export type CopyEffect = {
-  effectType: 'copy';
+  effectType: "copy";
   index: number;
 };
 
 export type SwapEffect = {
-  effectType: 'swap';
+  effectType: "swap";
 };
 
 export type StackEffect =

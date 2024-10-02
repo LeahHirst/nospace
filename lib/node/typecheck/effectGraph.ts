@@ -8,20 +8,20 @@ export type EffectGraphNode<T extends { effectType: string } = StackEffect> = {
 };
 
 type NodeFragment = {
-  head?: EffectGraphNode,
-  tail?: EffectGraphNode
+  head?: EffectGraphNode;
+  tail?: EffectGraphNode;
 };
 
 export function buildEffectGraph(branches: Branch[]) {
   const branchPointers = new Map<Branch, NodeFragment>();
   const baseNode: EffectGraphNode = {
     effect: {
-      effectType: 'add',
+      effectType: "add",
       type: Type.Never,
     },
     parents: new Set(),
     children: new Set(),
-  }
+  };
 
   const getHeadNodes = (branch: Branch): EffectGraphNode[] => {
     const fragment = branchPointers.get(branch);
@@ -30,16 +30,23 @@ export function buildEffectGraph(branches: Branch[]) {
     }
 
     if (!fragment.head) {
-      return [...new Set(([branch.controlFlowBranch, branch.callsSubroutine ? undefined : branch.nextBranch]
-        .filter(Boolean) as Branch[])
-        .flatMap(x => getHeadNodes(x)))];
+      return [
+        ...new Set(
+          (
+            [
+              branch.controlFlowBranch,
+              branch.callsSubroutine ? undefined : branch.nextBranch,
+            ].filter(Boolean) as Branch[]
+          ).flatMap((x) => getHeadNodes(x)),
+        ),
+      ];
     }
 
     return [fragment.head];
   };
 
   for (const branch of branches) {
-    const nodes = branch.effects.map(effect => ({
+    const nodes = branch.effects.map((effect) => ({
       effect,
       parents: new Set<EffectGraphNode>(),
       children: new Set<EffectGraphNode>(),
@@ -50,7 +57,10 @@ export function buildEffectGraph(branches: Branch[]) {
         node.parents.add(nodes[i - 1]);
       }
     });
-    branchPointers.set(branch, { head: nodes[0], tail: nodes[nodes.length - 1] });
+    branchPointers.set(branch, {
+      head: nodes[0],
+      tail: nodes[nodes.length - 1],
+    });
   }
 
   // Connect branches
@@ -61,7 +71,7 @@ export function buildEffectGraph(branches: Branch[]) {
       branch.callsSubroutine ? undefined : branch.nextBranch,
     ]
       .filter(Boolean)
-      .flatMap(x => getHeadNodes(x as Branch));
+      .flatMap((x) => getHeadNodes(x as Branch));
 
     if (fragment.tail) {
       for (const child of children) {
@@ -108,7 +118,9 @@ function findReturns(branch?: Branch, visited = new Set<Branch>()): Branch[] {
   }
 
   return [
-    ...(branch.callsSubroutine ? [] : findReturns(branch.controlFlowBranch, visited)),
+    ...(branch.callsSubroutine
+      ? []
+      : findReturns(branch.controlFlowBranch, visited)),
     ...findReturns(branch.nextBranch, visited),
   ];
 }

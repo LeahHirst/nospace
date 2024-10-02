@@ -1,2 +1,2 @@
-export { NospaceIR } from './NospaceIR';
-export * from './interfaces';
+export { NospaceIR } from "./NospaceIR";
+export * from "./interfaces";

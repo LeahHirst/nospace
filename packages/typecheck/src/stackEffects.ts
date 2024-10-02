@@ -7,7 +7,7 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.ReadInt: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Int,
         },
       ];
@@ -15,23 +15,23 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.WriteChar: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Char,
-        }
+        },
       ];
     }
     case Instruction.WriteInt: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Int,
-        }
+        },
       ];
     }
     case Instruction.Push: {
       return [
         {
-          effectType: 'push',
+          effectType: "push",
           type: Type.Any,
         },
       ];
@@ -39,7 +39,7 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Duplicate: {
       return [
         {
-          effectType: 'copy',
+          effectType: "copy",
           index: 0,
         },
       ];
@@ -47,14 +47,14 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Swap: {
       return [
         {
-          effectType: 'swap',
+          effectType: "swap",
         },
       ];
     }
     case Instruction.Pop: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Any,
         },
       ];
@@ -62,7 +62,7 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Copy: {
       return [
         {
-          effectType: 'copy',
+          effectType: "copy",
           index: operation.argument as number,
         },
       ];
@@ -70,11 +70,11 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Slide: {
       return [
         ...new Array(operation.argument + 1).fill({
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Any,
         }),
         {
-          effectType: 'copy',
+          effectType: "copy",
           index: operation.argument + 1,
         },
       ];
@@ -86,15 +86,15 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Mod: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Int,
         },
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Int,
         },
         {
-          effectType: 'push',
+          effectType: "push",
           type: Type.Int,
         },
       ];
@@ -103,7 +103,7 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.JumpNegative: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Int,
         },
       ];
@@ -111,11 +111,11 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Store: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Any,
         },
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Int,
         },
       ];
@@ -123,11 +123,11 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Retrieve: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Int,
         },
         {
-          effectType: 'push',
+          effectType: "push",
           type: Type.Any,
         },
       ];
@@ -135,11 +135,11 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Cast: {
       return [
         {
-          effectType: 'pop',
+          effectType: "pop",
           type: Type.Any,
         },
         {
-          effectType: 'push',
+          effectType: "push",
           type: operation.argument as Type,
         },
       ];
@@ -147,11 +147,12 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
     case Instruction.Assert: {
       return [
         {
-          effectType: 'assert',
+          effectType: "assert",
           type: operation.argument as Type,
         },
       ];
     }
-    default: return [];
+    default:
+      return [];
   }
 }

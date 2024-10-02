@@ -1,31 +1,39 @@
-import { Instruction, Operation, IRArgs, TokenMap, isNumericInstruction, isLabelledInstruction, ParseError } from "./interfaces";
+import {
+  Instruction,
+  Operation,
+  IRArgs,
+  TokenMap,
+  isNumericInstruction,
+  isLabelledInstruction,
+  ParseError,
+} from "./interfaces";
 import { irToNospace, irToWhitespace } from "./utils";
 
 function normalize(raw: string, ignoreNospace = false): string {
   const normalized = raw
-    .replace(/ /g, 's')
-    .replace(/\t/g, 't')
-    .replace(/\n/g, 'n');
+    .replace(/ /g, "s")
+    .replace(/\t/g, "t")
+    .replace(/\n/g, "n");
 
   if (ignoreNospace) {
-    return normalized.replace(/[^stn]/g, '') as string;
+    return normalized.replace(/[^stn]/g, "") as string;
   }
 
   return normalized
-    .replace(/\u200B/g, 's')
-    .replace(/\u200C/g, 't')
-    .replace(/\u200D/g, 'n')
-    .replace(/\u2060/g, 'x')
-    .replace(/[^stnx]/g, '') as string;
+    .replace(/\u200B/g, "s")
+    .replace(/\u200C/g, "t")
+    .replace(/\u200D/g, "n")
+    .replace(/\u2060/g, "x")
+    .replace(/[^stnx]/g, "") as string;
 }
 
 function parseNumber(chars: string) {
-  const unsigned = chars[0] === 's';
+  const unsigned = chars[0] === "s";
   const binary = chars
     .slice(1)
-    .replace(/n/g, '')
-    .replace(/s/g, '0')
-    .replace(/t/g, '1');
+    .replace(/n/g, "")
+    .replace(/s/g, "0")
+    .replace(/t/g, "1");
 
   return parseInt(binary, 2) * (unsigned ? 1 : -1);
 }
@@ -34,16 +42,39 @@ function parseNumber(chars: string) {
 function generateToken(n: number) {
   return n
     .toString(26)
-    .split('')
-    .map((x) => ({
-      0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E',
-      5: 'F', 6: 'G', 7: 'H', 8: 'I', 9: 'J',
-      a: 'K', b: 'L', c: 'M', d: 'N', e: 'O',
-      f: 'P', g: 'Q', h: 'R', i: 'S', j: 'T',
-      k: 'U', l: 'V', m: 'W', n: 'X', o: 'Y',
-      p: 'Z',
-    }[x]))
-    .join('');
+    .split("")
+    .map(
+      (x) =>
+        ({
+          0: "A",
+          1: "B",
+          2: "C",
+          3: "D",
+          4: "E",
+          5: "F",
+          6: "G",
+          7: "H",
+          8: "I",
+          9: "J",
+          a: "K",
+          b: "L",
+          c: "M",
+          d: "N",
+          e: "O",
+          f: "P",
+          g: "Q",
+          h: "R",
+          i: "S",
+          j: "T",
+          k: "U",
+          l: "V",
+          m: "W",
+          n: "X",
+          o: "Y",
+          p: "Z",
+        })[x],
+    )
+    .join("");
 }
 
 export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
@@ -53,15 +84,15 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
   const tokens: TokenMap = new Map();
   const errors: ParseError[] = [];
   let instruction: Instruction | undefined = undefined;
-  let buf: string = '';
+  let buf: string = "";
   let parsingArg = false;
   let startLn = 0;
   let ln = 0;
-  let startCol = 0; 
+  let startCol = 0;
   let col = 0;
   for (const char of normalized) {
     buf += char;
-    if (char === 'n') {
+    if (char === "n") {
       ln++;
       col = 1;
     } else {
@@ -69,7 +100,7 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
     }
 
     if (parsingArg) {
-      if (char === 'n') {
+      if (char === "n") {
         if (instruction) {
           const meta = {
             startLn,
@@ -84,7 +115,9 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
               meta,
             });
           } else if (isLabelledInstruction(instruction)) {
-            const token = Array.from(tokens.entries()).find(([_, v]) => v === buf)?.[0] ?? generateToken(tokens.size);
+            const token =
+              Array.from(tokens.entries()).find(([_, v]) => v === buf)?.[0] ??
+              generateToken(tokens.size);
             if (!tokens.has(token)) {
               tokens.set(token, buf);
             }
@@ -98,19 +131,21 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
           startLn = ln;
           startCol = col;
         }
-        buf = '';
+        buf = "";
         parsingArg = false;
       }
     } else {
       if (Object.values(Instruction).includes(buf as Instruction)) {
         instruction = buf as Instruction;
-        buf = '';
-        if (isNumericInstruction(instruction) || isLabelledInstruction(instruction)) {
+        buf = "";
+        if (
+          isNumericInstruction(instruction) ||
+          isLabelledInstruction(instruction)
+        ) {
           parsingArg = true;
         } else {
           operations.push({
             instruction,
-            argument: undefined,
             meta: {
               startLn,
               startCol,
@@ -125,7 +160,7 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
 
       if (buf.length > 4) {
         errors.push({
-          type: 'unknown_instruction',
+          type: "unknown_instruction",
           message: `Unrecognized instruction "${buf}"`,
           meta: {
             startLn: startLn,
@@ -140,7 +175,7 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
 
   if (!!buf) {
     errors.push({
-      type: 'unknown_instruction',
+      type: "unknown_instruction",
       message: `Unrecognized instruction "${ignoreNospace ? irToWhitespace(buf) : irToNospace(buf)}"`,
       meta: {
         startLn: startLn,
