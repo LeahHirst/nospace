@@ -1,16 +1,19 @@
-import { IRArgs, Instruction, Operation, TokenMap, isLabeledOperation, isNumericInstruction, isNumericOperation } from "./interfaces";
+import { IRArgs, Instruction, Operation, ParseError, TokenMap, isLabeledOperation, isNumericInstruction, isNumericOperation } from "./interfaces";
 import { parseNossembly } from "./parseNossembly";
 import { parseRaw } from "./parseRaw";
-import { serializeNumber } from "./utils";
+import { irToNospace, irToWhitespace, serializeNumber } from "./utils";
 
 export class NospaceIR {
   public readonly operations: Operation[];
 
   public readonly tokens: TokenMap;
 
-  private constructor({ operations, tokens }: IRArgs) {
+  public readonly parseErrors: ParseError[];
+
+  private constructor({ operations, tokens, parseErrors }: IRArgs) {
     this.operations = operations;
     this.tokens = tokens;
+    this.parseErrors = parseErrors;
   }
 
   toNossembly() {
@@ -38,26 +41,19 @@ export class NospaceIR {
   }
 
   toWhitespace() {
-    return this.operations
+    return irToWhitespace(this.operations
       .filter(x => ![
         Instruction.Cast,
         Instruction.Assert
       ].includes(x.instruction))
       .map(x => this.normalizeOperation(x).filter(Boolean).join(''))
-      .join('')
-      .replace(/s/g, ' ')
-      .replace(/t/g, '\t')
-      .replace(/n/g, '\n');
+      .join(''));
   }
 
   toNospace() {
-    return this.operations
+    return irToNospace(this.operations
       .map(x => this.normalizeOperation(x).filter(Boolean).join(''))
-      .join('')
-      .replace(/s/g, '\u200B')
-      .replace(/t/g, '\u200C')
-      .replace(/n/g, '\u200D')
-      .replace(/x/g, '\u2060');
+      .join(''))
   }
 
   static fromNossembly(nossembly: string): NospaceIR {
