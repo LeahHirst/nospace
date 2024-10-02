@@ -1,4 +1,4 @@
-import { Instruction, Operation, IRArgs, TokenMap, isNumericInstruction, NumericOperation, isLabelledInstruction } from "./interfaces";
+import { Instruction, Operation, IRArgs, TokenMap, isNumericInstruction, NumericOperation, isLabelledInstruction, ParseError } from "./interfaces";
 import { serializeNumber } from "./utils";
 
 function hasPragma(line: string) {
@@ -8,19 +8,33 @@ function hasPragma(line: string) {
 export function parseNossembly(nossembly: string): IRArgs {
   const operations: Operation[] = [];
   const tokens: Map<string, string> = new Map();
+  const errors: ParseError[] = [];
   const globals: Map<string, string> = new Map();
 
   nossembly
     .split('\n')
-    .filter((line) => !!line.trim())
     .forEach((line, lineNum) => {
+      if (!line.trim() || line.trim().startsWith('# ')) {
+        return;
+      }
+
       let parts = line.trim().replace(/# /g, '').split(' ');
 
       if (hasPragma(line)) {
         const [pragma, key, value, ...rest] = parts;
 
         if (!key || !value) {
-          throw new Error(`Pragmas must specify both a key and value (L${lineNum})`);
+          errors.push({
+            type: 'pragma',
+            message: 'Pragmas must specify both a key and value',
+            meta: {
+              startLn: lineNum,
+              startCol: line.indexOf(pragma ?? ''),
+              endCol: line.length,
+              endLn: lineNum,
+            },
+          });
+          return;
         }
 
         switch (pragma) {
@@ -32,32 +46,82 @@ export function parseNossembly(nossembly: string): IRArgs {
           }
           case '#define': {
             if (rest.length > 0) {
-              throw new Error(`Incorrect number of arguments for #define pragma on L${lineNum} (expected 2, got ${rest.length + 2})`);
+              errors.push({
+                type: 'pragma',
+                message: 'Incorrect number of arguments for #define pragma',
+                meta: {
+                  startLn: lineNum,
+                  startCol: line.indexOf(pragma ?? ''),
+                  endCol: line.length,
+                  endLn: lineNum,
+                },
+              });
+              return;
             }
 
             globals.set(key, value);
             return;
           }
-          default: throw new Error(`Unknown pragma "${pragma}" (L${lineNum})`);
+          default: {
+            errors.push({
+              type: 'pragma',
+              message: `Unknown pragma "${pragma}"`,
+              meta: {
+                startLn: lineNum,
+                startCol: line.indexOf(pragma ?? ''),
+                endCol: line.length,
+                endLn: lineNum,
+              },
+            });
+            return;
+          }
         }
       }
 
-      const [instructionName, arg, ...rest] = parts;
+      const [instructionName, arg] = parts;
       const [_, instruction] = Object.entries(Instruction)
         .find(([name]) => name === instructionName) ?? [];
 
       if (!instruction) {
-        throw new Error(`Unrecognized instruction "${instructionName}" (L${lineNum})`);
+        errors.push({
+          type: 'unknown_instruction',
+          message: `Unrecognized instruction "${instructionName}"`,
+          meta: {
+            startLn: lineNum,
+            startCol: line.indexOf(instructionName ?? ''),
+            endCol: line.length,
+            endLn: lineNum,
+          },
+        });
+        return;
       }
+
+      const meta = {
+        startLn: lineNum,
+        startCol: line.indexOf(instructionName ?? ''),
+        endLn: lineNum,
+        endCol: line.length,
+      };
 
       if (isNumericInstruction(instruction)) {
         operations.push({
           instruction,
           argument: Number(arg),
+          meta,
         });
       } else if (isLabelledInstruction(instruction)) {
         if (!arg) {
-          throw new Error('');
+          errors.push({
+            type: 'argument',
+            message: `An argument must be provided to the ${instructionName} instruction`,
+            meta: {
+              startLn: lineNum,
+              startCol: line.indexOf(instructionName ?? ''),
+              endCol: line.length,
+              endLn: lineNum,
+            },
+          });
+          return;
         }
         if (!tokens.has(arg)) {
           tokens.set(arg, serializeNumber(tokens.size));
@@ -65,11 +129,13 @@ export function parseNossembly(nossembly: string): IRArgs {
         operations.push({
           instruction,
           argument: arg,
+          meta,
         });
       } else {
         operations.push({
           instruction,
           argument: undefined,
+          meta,
         });
       }
     });
@@ -77,5 +143,6 @@ export function parseNossembly(nossembly: string): IRArgs {
   return {
     operations,
     tokens,
+    parseErrors: errors,
   };
 }

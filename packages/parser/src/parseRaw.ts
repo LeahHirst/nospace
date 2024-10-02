@@ -1,4 +1,5 @@
-import { Instruction, Operation, IRArgs, TokenMap, isNumericInstruction, isLabelledInstruction } from "./interfaces";
+import { Instruction, Operation, IRArgs, TokenMap, isNumericInstruction, isLabelledInstruction, ParseError } from "./interfaces";
+import { irToNospace, irToWhitespace } from "./utils";
 
 function normalize(raw: string, ignoreNospace = false): string {
   const normalized = raw
@@ -50,13 +51,14 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
 
   const operations: Operation[] = [];
   const tokens: TokenMap = new Map();
+  const errors: ParseError[] = [];
   let instruction: Instruction | undefined = undefined;
   let buf: string = '';
   let parsingArg = false;
-  let startLn = 1;
-  let ln = 1;
-  let startCol = 1; 
-  let col = 1;
+  let startLn = 0;
+  let ln = 0;
+  let startCol = 0; 
+  let col = 0;
   for (const char of normalized) {
     buf += char;
     if (char === 'n') {
@@ -122,13 +124,36 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
       }
 
       if (buf.length > 4) {
-        throw new Error(`Unrecognized instruction: ${buf}`);
+        errors.push({
+          type: 'unknown_instruction',
+          message: `Unrecognized instruction "${buf}"`,
+          meta: {
+            startLn: startLn,
+            startCol: startCol,
+            endLn: ln,
+            endCol: col,
+          },
+        });
       }
     }
+  }
+
+  if (!!buf) {
+    errors.push({
+      type: 'unknown_instruction',
+      message: `Unrecognized instruction "${ignoreNospace ? irToWhitespace(buf) : irToNospace(buf)}"`,
+      meta: {
+        startLn: startLn,
+        startCol: startCol,
+        endLn: ln,
+        endCol: col,
+      },
+    });
   }
 
   return {
     operations,
     tokens,
+    parseErrors: errors,
   };
 }
