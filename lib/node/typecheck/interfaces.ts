@@ -1,30 +1,30 @@
 export enum Instruction {
-  ReadChar = 'tnts',
-  ReadInt = 'tntt',
-  WriteChar = 'tnss',
-  WriteInt = 'tnst',
-  Push = 'ss',
-  Duplicate = 'sns',
-  Swap = 'snt',
-  Pop = 'snn',
-  Copy = 'sts',
-  Slide = 'stn',
-  Add = 'tsss',
-  Subtract = 'tsst',
-  Multiply = 'tssn',
-  Divide = 'tsts',
-  Mod = 'tstt',
-  Label = 'nss',
-  Call = 'nst',
-  Jump = 'nsn',
-  JumpZero = 'nts',
-  JumpNegative = 'ntt',
-  Return = 'ntn',
-  End = 'nnn',
-  Store = 'tts',
-  Retrieve = 'ttt',
-  Cast = 'xs',
-  Assert = 'xt',
+  ReadChar = "tnts",
+  ReadInt = "tntt",
+  WriteChar = "tnss",
+  WriteInt = "tnst",
+  Push = "ss",
+  Duplicate = "sns",
+  Swap = "snt",
+  Pop = "snn",
+  Copy = "sts",
+  Slide = "stn",
+  Add = "tsss",
+  Subtract = "tsst",
+  Multiply = "tssn",
+  Divide = "tsts",
+  Mod = "tstt",
+  Label = "nss",
+  Call = "nst",
+  Jump = "nsn",
+  JumpZero = "nts",
+  JumpNegative = "ntt",
+  Return = "ntn",
+  End = "nnn",
+  Store = "tts",
+  Retrieve = "ttt",
+  Cast = "xs",
+  Assert = "xt",
 }
 
 export const ParameterizedInstructions: Instruction[] = [
@@ -52,42 +52,42 @@ export type Operation = {
 };
 
 export enum Type {
-  Never = 'ttn',
-  Any = 'tsn',
-  Int = 'ssn',
-  Char = 'stn',
+  Never = "ttn",
+  Any = "tsn",
+  Int = "ssn",
+  Char = "stn",
 }
 
 export type AddEffect = {
-  effectType: 'add';
+  effectType: "add";
   type: Type | string;
 };
 
 export type SubtractEffect = {
-  effectType: 'subtract';
+  effectType: "subtract";
   type: Type | string;
 };
 
 export type AssertEffect = {
-  effectType: 'assert';
+  effectType: "assert";
   type: Type | string;
 };
 
 export type CopyEffect = {
-  effectType: 'copy';
+  effectType: "copy";
   index: number;
 };
 
 export type SwapEffect = {
-  effectType: 'swap';
+  effectType: "swap";
 };
 
-export type StackEffect = 
- | AddEffect
- | SubtractEffect
- | AssertEffect
- | CopyEffect
- | SwapEffect;
+export type StackEffect =
+  | AddEffect
+  | SubtractEffect
+  | AssertEffect
+  | CopyEffect
+  | SwapEffect;
 
 export type Branch = {
   label?: string;

@@ -1,7 +1,12 @@
-import type { Monaco } from './types';
-import type monaco from 'monaco-editor';
+import type { Monaco } from "./types";
+import type monaco from "monaco-editor";
 
-export function registerLanguage(monaco: Monaco, id: string, keywords: string[], tokenizer: monaco.languages.IMonarchLanguage['tokenizer']) {
+export function registerLanguage(
+  monaco: Monaco,
+  id: string,
+  keywords: string[],
+  tokenizer: monaco.languages.IMonarchLanguage["tokenizer"],
+) {
   if (!monaco) {
     return;
   }
@@ -11,13 +16,19 @@ export function registerLanguage(monaco: Monaco, id: string, keywords: string[],
   monaco.languages.registerCompletionItemProvider(id, {
     provideCompletionItems: (model, position) => {
       const word = model.getWordUntilPosition(position);
-      return ({
-        suggestions: keywords.map(keyword => ({
+      return {
+        suggestions: keywords.map((keyword) => ({
           label: keyword,
           kind: monaco.languages.CompletionItemKind.Method,
           insertText: keyword,
-          range: new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn),
-      })),
-    })},
+          range: new monaco.Range(
+            position.lineNumber,
+            word.startColumn,
+            position.lineNumber,
+            word.endColumn,
+          ),
+        })),
+      };
+    },
   });
 }

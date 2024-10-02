@@ -1,32 +1,32 @@
 export enum Instruction {
-  ReadChar = 'tnts',
-  ReadInt = 'tntt',
-  WriteChar = 'tnss',
-  WriteInt = 'tnst',
-  Push = 'ss',
-  Duplicate = 'sns',
-  Swap = 'snt',
-  Pop = 'snn',
-  Copy = 'sts',
-  Slide = 'stn',
-  Add = 'tsss',
-  Subtract = 'tsst',
-  Multiply = 'tssn',
-  Divide = 'tsts',
-  Mod = 'tstt',
-  Label = 'nss',
-  Call = 'nst',
-  Jump = 'nsn',
-  JumpZero = 'nts',
-  JumpNegative = 'ntt',
-  Return = 'ntn',
-  End = 'nnn',
-  Store = 'tts',
-  Retrieve = 'ttt',
-  Cast = 'xs',
-  Assert = 'xt',
-  Unknown = 'unknown',
-};
+  ReadChar = "tnts",
+  ReadInt = "tntt",
+  WriteChar = "tnss",
+  WriteInt = "tnst",
+  Push = "ss",
+  Duplicate = "sns",
+  Swap = "snt",
+  Pop = "snn",
+  Copy = "sts",
+  Slide = "stn",
+  Add = "tsss",
+  Subtract = "tsst",
+  Multiply = "tssn",
+  Divide = "tsts",
+  Mod = "tstt",
+  Label = "nss",
+  Call = "nst",
+  Jump = "nsn",
+  JumpZero = "nts",
+  JumpNegative = "ntt",
+  Return = "ntn",
+  End = "nnn",
+  Store = "tts",
+  Retrieve = "ttt",
+  Cast = "xs",
+  Assert = "xt",
+  Unknown = "unknown",
+}
 
 export const LabelledInstructions = [
   Instruction.Label,
@@ -51,51 +51,61 @@ export type OperationMeta = {
   endCol: number;
 };
 
-type OperationBase<I extends Instruction, A = undefined> = {
-  instruction: I;
-  argument: A;
-  meta?: OperationMeta;
-};
+type OperationBase<I extends Instruction, A = undefined> = A extends undefined
+  ? {
+      instruction: I;
+      argument?: A;
+      meta?: OperationMeta;
+    }
+  : {
+      instruction: I;
+      argument: A;
+      meta?: OperationMeta;
+    };
 
-export type NumericOperation = OperationBase<typeof NumericInstructions[number], number>;
+export type NumericOperation = OperationBase<
+  (typeof NumericInstructions)[number],
+  number
+>;
 
-export type LabeledOperation = OperationBase<typeof LabelledInstructions[number], string>;
+export type LabeledOperation = OperationBase<
+  (typeof LabelledInstructions)[number],
+  string
+>;
 
 type ParameterizedInstruction = NumericOperation | LabeledOperation;
 
 export type Operation =
   | ParameterizedInstruction
-  | OperationBase<Exclude<Instruction, ParameterizedInstruction['instruction']>>;
+  | OperationBase<
+      Exclude<Instruction, ParameterizedInstruction["instruction"]>
+    >;
 
 type Error = {
   message: string;
-  meta: OperationMeta; 
+  meta: OperationMeta;
 };
 
 export type UnknownInstructionError = Error & {
-  type: 'unknown_instruction';
-
+  type: "unknown_instruction";
 };
 
 export type ArgumentError = Error & {
-  type: 'argument'
+  type: "argument";
 };
 
 export type PragmaError = Error & {
-  type: 'pragma';
+  type: "pragma";
 };
 
-export type ParseError =
-  | UnknownInstructionError
-  | ArgumentError
-  | PragmaError;
+export type ParseError = UnknownInstructionError | ArgumentError | PragmaError;
 
 export enum Type {
-  Never = 'ttn',
-  Any = 'tsn',
-  Int = 'ssn',
-  Char = 'stn',
-};
+  Never = "ttn",
+  Any = "tsn",
+  Int = "ssn",
+  Char = "stn",
+}
 
 export type TokenMap = Map<string, string>;
 
@@ -105,18 +115,26 @@ export type IRArgs = {
   parseErrors: ParseError[];
 };
 
-export function isNumericInstruction(instruction: Instruction): instruction is typeof NumericInstructions[number] {
+export function isNumericInstruction(
+  instruction: Instruction,
+): instruction is (typeof NumericInstructions)[number] {
   return NumericInstructions.includes(instruction as any);
-};
+}
 
-export function isLabelledInstruction(instruction: Instruction): instruction is typeof LabelledInstructions[number] {
+export function isLabelledInstruction(
+  instruction: Instruction,
+): instruction is (typeof LabelledInstructions)[number] {
   return LabelledInstructions.includes(instruction as any);
-};
+}
 
-export function isNumericOperation(operation: Operation): operation is NumericOperation {
+export function isNumericOperation(
+  operation: Operation,
+): operation is NumericOperation {
   return isNumericInstruction(operation.instruction);
 }
 
-export function isLabeledOperation(operation: Operation): operation is LabeledOperation {
+export function isLabeledOperation(
+  operation: Operation,
+): operation is LabeledOperation {
   return isLabelledInstruction(operation.instruction);
 }

@@ -1,21 +1,24 @@
-import { NospaceIR } from '@repo/parser';
-import { Instruction, Operation } from '@repo/parser';
-import { parseNumber } from './utils';
+import { NospaceIR } from "@repo/parser";
+import { Instruction, Operation } from "@repo/parser";
+import { parseNumber } from "./utils";
 
 export class Program {
   private ir: NospaceIR;
-  
+
   private inputBuffer: string;
-  
-  public output: string = '';
-  
+
+  public output: string = "";
+
   private stack: number[] = [];
 
   private heap: number[] = [];
 
   private labelIndices: { [label: string]: number } = {};
 
-  constructor(public code: string, public input: string) {
+  constructor(
+    public code: string,
+    public input: string,
+  ) {
     this.inputBuffer = input;
     this.ir = NospaceIR.fromNospace(code);
     for (let i = 0; i < this.ir.operations.length; i++) {
@@ -27,7 +30,7 @@ export class Program {
   }
 
   public execute() {
-    this.output = '';
+    this.output = "";
     this.inputBuffer = this.input;
     this.stack = [];
     this.heap = [];
@@ -66,7 +69,10 @@ export class Program {
         return;
       }
       case Instruction.ReadInt: {
-        const char = this.inputBuffer[0] === undefined ? 0 : this.inputBuffer[0].charCodeAt(0);
+        const char =
+          this.inputBuffer[0] === undefined
+            ? 0
+            : this.inputBuffer[0].charCodeAt(0);
         this.inputBuffer = this.inputBuffer.slice(1);
         const addr = this.stack.pop();
         if (!addr) {

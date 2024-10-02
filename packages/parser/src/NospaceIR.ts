@@ -1,4 +1,13 @@
-import { IRArgs, Instruction, Operation, ParseError, TokenMap, isLabeledOperation, isNumericInstruction, isNumericOperation } from "./interfaces";
+import {
+  IRArgs,
+  Instruction,
+  Operation,
+  ParseError,
+  TokenMap,
+  isLabeledOperation,
+  isNumericInstruction,
+  isNumericOperation,
+} from "./interfaces";
 import { parseNossembly } from "./parseNossembly";
 import { parseRaw } from "./parseRaw";
 import { irToNospace, irToWhitespace, serializeNumber } from "./utils";
@@ -30,30 +39,34 @@ export class NospaceIR {
       if (op.instruction === Instruction.Label) {
         indent = true;
         if (lines.length > 0) {
-          lines.push('');
+          lines.push("");
         }
       }
-      const prefix = (indent && op.instruction !== Instruction.Label) ? '  ' : ''
-      lines.push([prefix, name, op.argument].filter(Boolean).join(' '));
+      const prefix = indent && op.instruction !== Instruction.Label ? "  " : "";
+      lines.push([prefix, name, op.argument].filter(Boolean).join(" "));
     }
 
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
   toWhitespace() {
-    return irToWhitespace(this.operations
-      .filter(x => ![
-        Instruction.Cast,
-        Instruction.Assert
-      ].includes(x.instruction))
-      .map(x => this.normalizeOperation(x).filter(Boolean).join(''))
-      .join(''));
+    return irToWhitespace(
+      this.operations
+        .filter(
+          (x) =>
+            ![Instruction.Cast, Instruction.Assert].includes(x.instruction),
+        )
+        .map((x) => this.normalizeOperation(x).filter(Boolean).join(""))
+        .join(""),
+    );
   }
 
   toNospace() {
-    return irToNospace(this.operations
-      .map(x => this.normalizeOperation(x).filter(Boolean).join(''))
-      .join(''))
+    return irToNospace(
+      this.operations
+        .map((x) => this.normalizeOperation(x).filter(Boolean).join(""))
+        .join(""),
+    );
   }
 
   static fromNossembly(nossembly: string): NospaceIR {
@@ -71,7 +84,9 @@ export class NospaceIR {
     return new NospaceIR(args);
   }
 
-  private normalizeOperation(operation: Operation): [Instruction, string | undefined] {
+  private normalizeOperation(
+    operation: Operation,
+  ): [Instruction, string | undefined] {
     if (isNumericOperation(operation)) {
       return [operation.instruction, serializeNumber(operation.argument)];
     }

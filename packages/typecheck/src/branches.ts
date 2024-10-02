@@ -6,17 +6,21 @@ export function extractBranches(operations: Operation[]): Branch[] {
     operations: [],
   };
 
-  const labelledBranches: Branch[] = operations.filter(x => x.instruction === Instruction.Label).map(x => ({
-    label: x.argument as string,
-    operations: [],
-  }));
+  const labelledBranches: Branch[] = operations
+    .filter((x) => x.instruction === Instruction.Label)
+    .map((x) => ({
+      label: x.argument as string,
+      operations: [],
+    }));
 
   const branches: Branch[] = [currentBranch];
 
   for (const operation of operations) {
     switch (operation.instruction) {
       case Instruction.Label: {
-        const newBranch = labelledBranches.find(x => x.label === operation.argument)!;
+        const newBranch = labelledBranches.find(
+          (x) => x.label === operation.argument,
+        )!;
         currentBranch.nextBranch = newBranch;
         branches.push(currentBranch);
         currentBranch = newBranch;
@@ -28,14 +32,18 @@ export function extractBranches(operations: Operation[]): Branch[] {
           callsSubroutine: true,
         };
         currentBranch.nextBranch = newBranch;
-        currentBranch.controlFlowBranch = labelledBranches.find(branch => branch.label === operation.argument);
+        currentBranch.controlFlowBranch = labelledBranches.find(
+          (branch) => branch.label === operation.argument,
+        );
         currentBranch.callsSubroutine = true;
         branches.push(currentBranch);
         currentBranch = newBranch;
         break;
       }
       case Instruction.Jump: {
-        const labelledBranch = labelledBranches.find(branch => branch.label === operation.argument);
+        const labelledBranch = labelledBranches.find(
+          (branch) => branch.label === operation.argument,
+        );
         currentBranch.nextBranch = labelledBranch;
         branches.push(currentBranch);
         currentBranch = {
@@ -45,7 +53,9 @@ export function extractBranches(operations: Operation[]): Branch[] {
       }
       case Instruction.JumpZero:
       case Instruction.JumpNegative: {
-        const labelledBranch = labelledBranches.find(branch => branch.label === operation.argument);
+        const labelledBranch = labelledBranches.find(
+          (branch) => branch.label === operation.argument,
+        );
         currentBranch.operations.push(operation);
         currentBranch.nextBranch = labelledBranch;
         branches.push(currentBranch);

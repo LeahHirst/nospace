@@ -10,93 +10,110 @@ function result(assembly: string, printDiagram?: boolean) {
   const branches = extractBranches(ops);
   const tc = new Typecheck(branches);
   if (printDiagram) {
-    console.log('Before:');
+    console.log("Before:");
     console.log(diagram(tc.graphRoot));
   }
   const success = tc.run();
   if (printDiagram) {
-    console.log('After:');
+    console.log("After:");
     console.log(diagram(tc.graphRoot));
   }
   return success;
 }
 
-describe('Typechecker', () => {
-  describe('No-op program', () => {
-    it('passes', () => {
-      expect(result('')).toBeTruthy();
+describe("Typechecker", () => {
+  describe("No-op program", () => {
+    it("passes", () => {
+      expect(result("")).toBeTruthy();
     });
   });
-  
-  describe('Primitives', () => {
-    it('can pop Any value', () => {
-      expect(result(`
+
+  describe("Primitives", () => {
+    it("can pop Any value", () => {
+      expect(
+        result(`
         Push 1
         Pop
-      `)).toBeTruthy();
+      `),
+      ).toBeTruthy();
     });
 
-    it('can pop typed value', () => {
-      expect(result(`
+    it("can pop typed value", () => {
+      expect(
+        result(`
         Push 1
         Cast Char
         Pop
-      `)).toBeTruthy();
+      `),
+      ).toBeTruthy();
     });
 
-    it('cannot underflow stack', () => {
-      expect(result(`
+    it("cannot underflow stack", () => {
+      expect(
+        result(`
         Pop
-      `)).toBeFalsy();
+      `),
+      ).toBeFalsy();
     });
   });
 
-  describe('Casting and assertions', () => {
-    describe('with Any base value', () => {
-      it('can assert Any value', () => {
-        expect(result(`
+  describe("Casting and assertions", () => {
+    describe("with Any base value", () => {
+      it("can assert Any value", () => {
+        expect(
+          result(`
           Push 1
           Assert Any
-        `)).toBeTruthy();
+        `),
+        ).toBeTruthy();
       });
-  
-      it('can assert typed value', () => {
-        expect(result(`
+
+      it("can assert typed value", () => {
+        expect(
+          result(`
           Push 1
           Assert Char
-        `)).toBeTruthy();
+        `),
+        ).toBeTruthy();
       });
     });
 
-    describe('with typed base value', () => {
-      it('can assert Any value', () => {
-        expect(result(`
+    describe("with typed base value", () => {
+      it("can assert Any value", () => {
+        expect(
+          result(`
           Push 1
           Cast Char
           Assert Any
-        `)).toBeTruthy();
+        `),
+        ).toBeTruthy();
       });
 
-      it('can assert typed value', () => {
-        expect(result(`
+      it("can assert typed value", () => {
+        expect(
+          result(`
           Push 1
           Cast Char
           Assert Char
-        `)).toBeTruthy();
+        `),
+        ).toBeTruthy();
       });
 
-      it('cannot assert an incompatible types', () => {
-        expect(result(`
+      it("cannot assert an incompatible types", () => {
+        expect(
+          result(`
           Push 1
           Cast Char
           Assert Int
-        `)).toBeFalsy();
+        `),
+        ).toBeFalsy();
       });
     });
 
-    describe('with multiple stack items', () => {
-      it('valid chained assertions pass', () => {
-        expect(result(`
+    describe("with multiple stack items", () => {
+      it("valid chained assertions pass", () => {
+        expect(
+          result(`
           Push 1
           Cast CustomA
           Push 2
@@ -109,11 +126,13 @@ describe('Typechecker', () => {
           Assert CustomB
           Pop
           Assert CustomA
-        `)).toBeTruthy();
+        `),
+        ).toBeTruthy();
       });
 
-      it('incorrect assertions fail', () => {
-        expect(result(`
+      it("incorrect assertions fail", () => {
+        expect(
+          result(`
           Push 1
           Cast CustomA
           Push 2
@@ -124,70 +143,82 @@ describe('Typechecker', () => {
           Assert CustomC
           Pop
           Assert CustomA
-        `)).toBeFalsy();
-      })
+        `),
+        ).toBeFalsy();
+      });
     });
   });
 
-  describe('Labels', () => {
-    it('types persist during waterfalling', () => {
-      expect(result(`
+  describe("Labels", () => {
+    it("types persist during waterfalling", () => {
+      expect(
+        result(`
         Push 1
         Cast Int
         Label A
           Assert Char
-      `)).toBeFalsy();
+      `),
+      ).toBeFalsy();
     });
 
-    it('Jump with empty branch works', () => {
-      expect(result(`
+    it("Jump with empty branch works", () => {
+      expect(
+        result(`
         Jump A
 
         Label A
           Push 1
           Assert Int
-      `)).toBeTruthy();
+      `),
+      ).toBeTruthy();
     });
 
-    it('types persist after Jump', () => {
-      expect(result(`
+    it("types persist after Jump", () => {
+      expect(
+        result(`
         Push 1
         Cast Int
         Jump A
 
         Label A
           Assert Char
-      `)).toBeFalsy();
+      `),
+      ).toBeFalsy();
     });
 
-    it('types persist after JumpZero', () => {
-      expect(result(`
+    it("types persist after JumpZero", () => {
+      expect(
+        result(`
         Push 1
         Cast Int
         JumpZero A
 
         Label A
           Assert Char
-      `)).toBeFalsy();
+      `),
+      ).toBeFalsy();
     });
 
-    it('types persist after JumpNegative', () => {
-      expect(result(`
+    it("types persist after JumpNegative", () => {
+      expect(
+        result(`
         Push 1
         Cast Int
         JumpNegative A
 
         Label A
           Assert Char
-      `)).toBeFalsy();
+      `),
+      ).toBeFalsy();
     });
   });
 
-  describe('Branching', () => {
-    describe('with multiple converging branches', () => {
-      describe('if one branch condition matches', () => {
-        it('passes', () => {
-          expect(result(`
+  describe("Branching", () => {
+    describe("with multiple converging branches", () => {
+      describe("if one branch condition matches", () => {
+        it("passes", () => {
+          expect(
+            result(`
             Push 1
             Push 1
             JumpZero A
@@ -207,13 +238,15 @@ describe('Typechecker', () => {
               Assert Int
               Pop
               Assert CustomType
-          `)).toBeTruthy();
+          `),
+          ).toBeTruthy();
         });
       });
 
-      describe('if no branch condition matches', () => {
-        it('fails', () => {
-          expect(result(`
+      describe("if no branch condition matches", () => {
+        it("fails", () => {
+          expect(
+            result(`
             Push 1
             Push 1
             JumpZero B
@@ -228,27 +261,31 @@ describe('Typechecker', () => {
 
             Label C
               Assert CustomC
-          `)).toBeFalsy();
+          `),
+          ).toBeFalsy();
         });
       });
     });
 
-    describe('with loops', () => {
-      describe('loop with consistent type', () => {
-        it('passes', () => {
-          expect(result(`
+    describe("with loops", () => {
+      describe("loop with consistent type", () => {
+        it("passes", () => {
+          expect(
+            result(`
             Push 1
             Cast Int
             Label A
               Assert Int
               JumpNegative A
-          `)).toBeTruthy();
+          `),
+          ).toBeTruthy();
         });
       });
 
-      describe('loop with recursive type', () => {
-        it('passes when asserting recursive type', () => {
-          expect(result(`
+      describe("loop with recursive type", () => {
+        it("passes when asserting recursive type", () => {
+          expect(
+            result(`
             Push 1
             Cast Int
             Label A
@@ -261,11 +298,13 @@ describe('Typechecker', () => {
               Assert CustomA
               Pop
               Assert CustomA
-          `)).toBeTruthy();
+          `),
+          ).toBeTruthy();
         });
 
-        it('passes when asserting underlying type', () => {
-          expect(result(`
+        it("passes when asserting underlying type", () => {
+          expect(
+            result(`
             Push 1
             Cast Int
             Label A
@@ -278,11 +317,13 @@ describe('Typechecker', () => {
               Assert CustomA
               Pop
               Assert Int
-          `)).toBeTruthy();
+          `),
+          ).toBeTruthy();
         });
 
-        it('asserting both union types fail', () => {
-          expect(result(`
+        it("asserting both union types fail", () => {
+          expect(
+            result(`
             Push 1
             Cast Int
             Label A
@@ -296,15 +337,17 @@ describe('Typechecker', () => {
               Pop
               Assert CustomA
               Assert Int
-          `)).toBeFalsy();
+          `),
+          ).toBeFalsy();
         });
       });
     });
   });
 
-  describe('Subroutines', () => {
-    it('subroutines apply types correctly outside of call', () => {
-      expect(result(`
+  describe("Subroutines", () => {
+    it("subroutines apply types correctly outside of call", () => {
+      expect(
+        result(`
         Call A
         Jump B
 
@@ -315,11 +358,13 @@ describe('Typechecker', () => {
 
         Label B
           Assert CustomA
-      `)).toBeTruthy();
+      `),
+      ).toBeTruthy();
     });
 
-    it('nested subroutines apply types correctly outside of call', () => {
-      expect(result(`
+    it("nested subroutines apply types correctly outside of call", () => {
+      expect(
+        result(`
         Call A
         Jump C
 
@@ -337,11 +382,12 @@ describe('Typechecker', () => {
 
         Label C
           Assert CustomB
-      `)).toBeTruthy();
+      `),
+      ).toBeTruthy();
     });
 
-    describe('calls into subroutines with union types', () => {
-      it('passes when asserting union type', () => {
+    describe("calls into subroutines with union types", () => {
+      it("passes when asserting union type", () => {
         const test = (type: string) => `
           Push 1
           JumpZero A
@@ -363,8 +409,8 @@ describe('Typechecker', () => {
           Label D
             Assert ${type}
         `;
-        expect(result(test('CustomA'))).toBeTruthy();
-        expect(result(test('CustomB'))).toBeTruthy();
+        expect(result(test("CustomA"))).toBeTruthy();
+        expect(result(test("CustomB"))).toBeTruthy();
       });
     });
   });

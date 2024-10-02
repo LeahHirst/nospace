@@ -12,7 +12,7 @@ export class Typecheck {
   constructor(branches: Branch[]) {
     const root = buildEffectGraph(branches);
     if (!root) {
-      throw new Error('Could not build type graph');
+      throw new Error("Could not build type graph");
     }
     this.graphRoot = root;
   }
@@ -36,8 +36,8 @@ export class Typecheck {
         continue;
       }
       visited.add(node);
-      if (node.effect.effectType !== 'add') {
-        nodes.add(node)
+      if (node.effect.effectType !== "add") {
+        nodes.add(node);
       }
       queue.push(...node.children);
     }
@@ -56,24 +56,27 @@ export class Typecheck {
         }
       }
       if (!progressed) {
-        throw new Error('TypeError: Failed to resolve all nodes');
+        throw new Error("TypeError: Failed to resolve all nodes");
       }
     }
   }
 
-  private resolves(node: EffectGraphNode, nodesToResolve: Set<EffectGraphNode>) {
-    if (node.effect.effectType === 'swap') {
+  private resolves(
+    node: EffectGraphNode,
+    nodesToResolve: Set<EffectGraphNode>,
+  ) {
+    if (node.effect.effectType === "swap") {
       const swappedTypes = this.swappedTypes.get(node) ?? new Set();
       for (const parent of node.parents) {
-        if (parent.effect.effectType !== 'add') {
+        if (parent.effect.effectType !== "add") {
           continue;
         }
         for (const grandparent of parent.parents) {
-          if (grandparent.effect.effectType !== 'add') {
+          if (grandparent.effect.effectType !== "add") {
             continue;
           }
 
-          const key = [grandparent.effect.type, parent.effect.type].join('-');
+          const key = [grandparent.effect.type, parent.effect.type].join("-");
           if (swappedTypes.has(key)) {
             continue;
           }
@@ -81,7 +84,7 @@ export class Typecheck {
 
           const newGrandparent: EffectGraphNode = {
             effect: {
-              effectType: 'add',
+              effectType: "add",
               type: parent.effect.type,
             },
             parents: new Set(),
@@ -89,7 +92,7 @@ export class Typecheck {
           };
           const newParent: EffectGraphNode = {
             effect: {
-              effectType: 'add',
+              effectType: "add",
               type: grandparent.effect.type,
             },
             parents: new Set(),
@@ -111,9 +114,13 @@ export class Typecheck {
       this.swappedTypes.set(node, swappedTypes);
       return true;
     }
-    
-    if (node.effect.effectType === 'copy') {
-      const typeNodes = getNthAncestors(node, node.effect.index + 1, n => n === node || n.effect.effectType === 'add');
+
+    if (node.effect.effectType === "copy") {
+      const typeNodes = getNthAncestors(
+        node,
+        node.effect.index + 1,
+        (n) => n === node || n.effect.effectType === "add",
+      );
       if (typeNodes.length === 0) {
         return false;
       }
@@ -123,30 +130,43 @@ export class Typecheck {
           continue;
         }
 
-        const unionTypeNode = this.createUnionTypeNode(typeNode.effect.type, node);
-        
+        const unionTypeNode = this.createUnionTypeNode(
+          typeNode.effect.type,
+          node,
+        );
       }
 
       return true;
     }
-    
+
     let hasResolved = false;
     for (const parent of node.parents) {
-      if (parent.effect.effectType !== 'add' || parent.effect.type === Type.Never) {
+      if (
+        parent.effect.effectType !== "add" ||
+        parent.effect.type === Type.Never
+      ) {
         continue;
       }
 
-      if (parent.effect.type !== Type.Any && node.effect.type !== Type.Any && parent.effect.type !== node.effect.type) {
+      if (
+        parent.effect.type !== Type.Any &&
+        node.effect.type !== Type.Any &&
+        parent.effect.type !== node.effect.type
+      ) {
         continue;
       }
 
       hasResolved = true;
       node.propegate = true;
 
-      if (node.effect.effectType === 'assert') {
+      if (node.effect.effectType === "assert") {
         // link parent to children
         for (const child of node.children) {
-          if (child.effect.effectType !== 'add' && parent.effect.effectType === 'add' && !child.parents.has(parent)) {
+          if (
+            child.effect.effectType !== "add" &&
+            parent.effect.effectType === "add" &&
+            !child.parents.has(parent)
+          ) {
             nodesToResolve.add(child);
           }
 
@@ -159,10 +179,14 @@ export class Typecheck {
       // link grandparents to children
       for (const grandparent of parent.parents) {
         for (const child of node.children) {
-          if (child.effect.effectType !== 'add' && grandparent.effect.effectType === 'add' && !child.parents.has(grandparent)) {
+          if (
+            child.effect.effectType !== "add" &&
+            grandparent.effect.effectType === "add" &&
+            !child.parents.has(grandparent)
+          ) {
             nodesToResolve.add(child);
           }
-          
+
           grandparent.children.add(child);
           child.parents.add(grandparent);
         }
@@ -172,8 +196,11 @@ export class Typecheck {
     return hasResolved;
   }
 
-  private collectChildren(node: EffectGraphNode, visited = new Set<EffectGraphNode>()): EffectGraphNode[] {
-    return [...node.children].flatMap(child => {
+  private collectChildren(
+    node: EffectGraphNode,
+    visited = new Set<EffectGraphNode>(),
+  ): EffectGraphNode[] {
+    return [...node.children].flatMap((child) => {
       if (visited.has(child)) {
         return [];
       }
@@ -188,7 +215,7 @@ export class Typecheck {
     this.managedUnionTypes.set(owner, typeSet);
     return {
       effect: {
-        effectType: 'add',
+        effectType: "add",
         type,
       },
       parents: new Set(),

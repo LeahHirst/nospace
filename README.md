@@ -5,12 +5,12 @@
 [![Downloads](https://img.shields.io/npm/dm/nospace.svg)](https://www.npmjs.com/package/nospace)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/LeahHirst/nospace/badge)](https://securityscorecards.dev/viewer/?uri=github.com/LeahHirst/nospace)
 
-
 Nospace is an [esoteric programming language](https://en.wikipedia.org/wiki/Esoteric_programming_language) for application-scale [Whitespace](https://esolangs.org/wiki/Whitespace). Nospace adds optional types to Whitespace that support tools for large-scale Whitespace applications. Nospace compiles to readable, standards-based Whitespace.
 
 In addition to types, Nospace provides lexical aliasing of spaces with zero-width spaces (`​`), tabs with zero-width non-joiners (`‌`), and feed lines with zero-width joiners (`‍`). These changes allow for the creation of zero-width, single lined programs for worsened readability.
 
 ## Hello world
+
 The following is a simple hello world program in Nospace:
 
 ```
@@ -59,49 +59,47 @@ Items stored and retrieved in the heap are untyped (i.e. have an `Any` type). Ty
 
 There are different types of commands in Nospace, and they all have different Instruction Modification Parameters (IMP), which can be thought of as the category a command falls in. Every command starts with an IMP, followed by the remainder of the command, and followed by parameters, if necessary.
 
-| IMP | Command |
-| --- | ------- |
-| `⁠` | Types |
-| `‌‍`  | I/O     |
+| IMP  | Command            |
+| ---- | ------------------ |
+| `⁠`  | Types              |
+| `‌‍` | I/O                |
 | `​`  | Stack manipulation |
-| `‌​`  | Arithmetic |
-| `‍`  | Flow control |
-| `‌‌`  | Heap access |
+| `‌​` | Arithmetic         |
+| `‍`  | Flow control       |
+| `‌‌` | Heap access        |
 
 ### Types
 
-| Commands | Parameters | Meaning |
-| - | - | - |
-| `⁠​` | Type | Casts the top item in the stack to the specified type | 
-| `⁠` | Type | Asserts that the top item in the stack is compatible with the specified type |
-
+| Commands | Parameters | Meaning                                                                      |
+| -------- | ---------- | ---------------------------------------------------------------------------- |
+| `⁠​`     | Type       | Casts the top item in the stack to the specified type                        |
+| `⁠`      | Type       | Asserts that the top item in the stack is compatible with the specified type |
 
 ### Numbers
 
 Numbers start with a sign (`​` for positive or `‌` for negative), then have a sequence of `​` (0) and `‌` (1) representing the number in binary, and end with `‍`. For example, the number 2,482,491,305 can be represented as `​‍‌‍​‍​‍‌‍​‍​‍‌‍‌‍‌‍‌‍‌‍‌‍​‍‌‍‌‍‌‍‌‍‌‍​‍​‍‌‍‌‍‌‍‌‍‌‍​‍‌‍​‍‌‍​‍​‍‌‍`.
 
-
 ### I/O
 
-| Commands | Parameters | Meaning |
-| - | - | - |
-| `‌​` | - | Pop a heap address from the stack, read a character as ASCII, and store that character to that heap address | 
-| `‌‌` | - | Pop a heap address from the stack, read a number, and store that number to that heap address |
-| `​​` | - | Pop a number from the stack and output it as an ASCII character |
-| `​‌` | - | Pop a number from the stack and output it |
+| Commands | Parameters | Meaning                                                                                                     |
+| -------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| `‌​`     | -          | Pop a heap address from the stack, read a character as ASCII, and store that character to that heap address |
+| `‌‌`     | -          | Pop a heap address from the stack, read a number, and store that number to that heap address                |
+| `​​`     | -          | Pop a number from the stack and output it as an ASCII character                                             |
+| `​‌`     | -          | Pop a number from the stack and output it                                                                   |
 
 The general pattern for the IO instructions is that the first character is `‌` when an instruction is for input, and `​` when it's for output. The second character is then `​` for a character, and `‌` for a number.
 
 ### Stack manipulation
 
-| Commands‍ | Parameters‍ | Meaning |
-| - | - | - |
-| `​` | Int | Push a value to the stack |
-| `‍​‍` | -‍ | Duplicate the top item on the stack |
-| `‍‌‍` | -‍ | Swap the top two items on the stack |
-| `‍‍‍` | -‍ | Discard the top item on the stack |
-| `‌​‍` | Int | Copy the nth item on the stack (given by the argument) onto the top of the stack (v0.3) |
-| `‌‍‍` | Int | Slide n items off the stack, keeping the top item (v0.3) |
+| Commands‍ | Parameters‍ | Meaning                                                                                 |
+| --------- | ----------- | --------------------------------------------------------------------------------------- |
+| `​`       | Int         | Push a value to the stack                                                               |
+| `‍​‍`     | -‍          | Duplicate the top item on the stack                                                     |
+| `‍‌‍`     | -‍          | Swap the top two items on the stack                                                     |
+| `‍‍‍`     | -‍          | Discard the top item on the stack                                                       |
+| `‌​‍`     | Int         | Copy the nth item on the stack (given by the argument) onto the top of the stack (v0.3) |
+| `‌‍‍`     | Int         | Slide n items off the stack, keeping the top item (v0.3)                                |
 
 Note that the copy and slide commands do not persist the type of the copied or retained item. They are instead represented as an Any type.
 
@@ -109,33 +107,33 @@ Note that the copy and slide commands do not persist the type of the copied or r
 
 Arithmetic commands operate on the top two items on the stack, and replace them with the result of the operation. The first element pushed is considered to be left of the operator.
 
-| Command | Parameters | Meaning |
-| - | - | - |
-| `​​` | - | Addition |
-| `​‌` | - | Subtraction |
-| `​‍` | - | Multiplication |
-| `‌​` | - | Integer Division |
-| `‌‌` | - | Modulo |
+| Command | Parameters | Meaning          |
+| ------- | ---------- | ---------------- |
+| `​​`    | -          | Addition         |
+| `​‌`    | -          | Subtraction      |
+| `​‍`    | -          | Multiplication   |
+| `‌​`    | -          | Integer Division |
+| `‌‌`    | -          | Modulo           |
 
 ### Flow Control
 
-| Commands | Parameters | Meaning |
-| - | - | - |
-| `​​` | Label | Mark a location in the program |
-| `​‌` | Label | Call a subroutine |
-| `​‍` | Label | Jump unconditionally to a label |
-| `‌​` | Label | Jump to a label if the top of the stack is zero |
-| `‌‌` | Label | Jump to a label if the top of the stack is negative |
-| `‌‍` | - | End a subroutine and transfer control back to the caller |
-| `‍‍` | - | Ends the program |
+| Commands | Parameters | Meaning                                                  |
+| -------- | ---------- | -------------------------------------------------------- |
+| `​​`     | Label      | Mark a location in the program                           |
+| `​‌`     | Label      | Call a subroutine                                        |
+| `​‍`     | Label      | Jump unconditionally to a label                          |
+| `‌​`     | Label      | Jump to a label if the top of the stack is zero          |
+| `‌‌`     | Label      | Jump to a label if the top of the stack is negative      |
+| `‌‍`     | -          | End a subroutine and transfer control back to the caller |
+| `‍‍`     | -          | Ends the program                                         |
 
 Labels are a sequence of `​` and `‌`, ended by `‍`.
 
 ### Heap Access
 
-| Command | Parameters | Meaning |
-| - | - | - |
-| `​` | - | Store |
-| `‌` | - | Retrieve |
+| Command | Parameters | Meaning  |
+| ------- | ---------- | -------- |
+| `​`     | -          | Store    |
+| `‌`     | -          | Retrieve |
 
 Heap access commands look at the stack to find the address of the items to be stored or retrieved. To store a number, the address and value must be pushed in that order, then the store command must be run. To retrieve a number, the address must be pushed and the retrieve command must be run after; this will push the value at the given address to the stack.

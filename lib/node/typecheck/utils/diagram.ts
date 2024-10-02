@@ -12,7 +12,7 @@ export function diagram(rootNode: EffectGraphNode) {
     }
     visitedNamedNodes.add(node);
 
-    const name = `${node.effect.effectType}_${(node.effect as any).type ?? ''}_${nodeNames.size}`;
+    const name = `${node.effect.effectType}_${(node.effect as any).type ?? ""}_${nodeNames.size}`;
     nodeNames.set(node, name);
     for (const child of node.children) {
       nameNodes(child);
@@ -51,8 +51,8 @@ export function diagram(rootNode: EffectGraphNode) {
 
   return `@startuml
 digraph G {
-  ${[...visitedNodes].map(n => `${nodeNames.get(n)} [label="${n.effect.effectType} ${(getType(n))}"]`).join('\n  ')}
-  ${connections.join('\n  ')}
+  ${[...visitedNodes].map((n) => `${nodeNames.get(n)} [label="${n.effect.effectType} ${getType(n)}"]`).join("\n  ")}
+  ${connections.join("\n  ")}
 }
 @enduml`;
 }

@@ -1,8 +1,9 @@
 import { Instruction, IRArgs } from "../interfaces";
 import { parseRaw } from "../parseRaw";
 
-const allInstructions = 'tntstntttnsstnstssststnsnssntsnnstsststnstnststntssstssttssntstststtnssststnnstststnnsnststnntsststnnttststnntnnnnttsttt';
-const typeInstructions = 'xsststnxtststn';
+const allInstructions =
+  "tntstntttnsstnstssststnsnssntsnnstsststnstnststntssstssttssntstststtnssststnnstststnnsnststnntsststnnttststnntnnnnttsttt";
+const typeInstructions = "xsststnxtststn";
 
 const expectedAllInstructions = [
   {
@@ -19,7 +20,7 @@ const expectedAllInstructions = [
   },
   {
     instruction: Instruction.Push,
-    argument: 'ststn',
+    argument: 5,
   },
   {
     instruction: Instruction.Duplicate,
@@ -32,11 +33,11 @@ const expectedAllInstructions = [
   },
   {
     instruction: Instruction.Copy,
-    argument: 'ststn',
+    argument: 5,
   },
   {
     instruction: Instruction.Slide,
-    argument: 'ststn',
+    argument: 5,
   },
   {
     instruction: Instruction.Add,
@@ -55,23 +56,23 @@ const expectedAllInstructions = [
   },
   {
     instruction: Instruction.Label,
-    argument: 'ststn',
+    argument: "A",
   },
   {
     instruction: Instruction.Call,
-    argument: 'ststn',
+    argument: "A",
   },
   {
     instruction: Instruction.Jump,
-    argument: 'ststn',
+    argument: "A",
   },
   {
     instruction: Instruction.JumpZero,
-    argument: 'ststn',
+    argument: "A",
   },
   {
     instruction: Instruction.JumpNegative,
-    argument: 'ststn',
+    argument: "A",
   },
   {
     instruction: Instruction.Return,
@@ -85,82 +86,84 @@ const expectedAllInstructions = [
   {
     instruction: Instruction.Retrieve,
   },
-];
+].map((x) => ({ ...x, meta: expect.any(Object) }));
 
 const expectedTypeInstructions = [
   {
     instruction: Instruction.Cast,
-    argument: 'ststn',
+    argument: "A",
   },
   {
     instruction: Instruction.Assert,
-    argument: 'ststn',
+    argument: "A",
   },
-];
+].map((x) => ({ ...x, meta: expect.any(Object) }));
 
-const labelInstructions = 'nssstnnssssnnssstsnnsssttn';
+const labelInstructions = "nssstnnssssnnssstsnnsssttn";
 
 function toWhitespace(readable: string) {
   return readable
-    .split('')
-    .map(x => ({ s: ' ', t: '\t', n: '\n' }[x]))
-    .join('');
+    .split("")
+    .map((x) => ({ s: " ", t: "\t", n: "\n" })[x])
+    .join("");
 }
 
 function toNospace(readable: string) {
   return readable
-    .split('')
-    .map(x => ({ s: '\u200B', t: '\u200C', n: '\u200D', x: '\u2060' }[x]))
-    .join('');
+    .split("")
+    .map((x) => ({ s: "\u200B", t: "\u200C", n: "\u200D", x: "\u2060" })[x])
+    .join("");
 }
 
-describe('parseRaw', () => {
-  describe('when parsing whitespace', () => {
-    it('parses instructions correctly', () => {
+describe("parseRaw", () => {
+  describe("when parsing whitespace", () => {
+    it("parses instructions correctly", () => {
       const result = parseRaw(toWhitespace(allInstructions), true);
-      expect(result.operations).toEqual(expectedAllInstructions);
+      expect(result.operations).toEqual(
+        expectedAllInstructions.map((x) => expect.objectContaining(x)),
+      );
     });
 
-    it('generates tokens', () => {
+    it("generates tokens", () => {
       const result = parseRaw(toWhitespace(labelInstructions), true);
       expect(Array.from(result.tokens.entries())).toEqual([
-        ['A', 'stn'],
-        ['B', 'ssn'],
-        ['C', 'stsn'],
-        ['D', 'sttn'],
+        ["A", "stn"],
+        ["B", "ssn"],
+        ["C", "stsn"],
+        ["D", "sttn"],
       ]);
     });
 
-    it('ignores nospace characters', () => {
+    it("ignores nospace characters", () => {
       const result = parseRaw(
         toWhitespace(allInstructions)
-          .split('')
-          .map((x) => x + '\u200B')
-          .join(''),
+          .split("")
+          .map((x) => x + "\u200B")
+          .join(""),
         true,
       );
       expect(result.operations).toEqual(expectedAllInstructions);
     });
   });
 
-  describe('when parsing nospace', () => {
-    it('parses whitespace instructions correctly', () => {
+  describe("when parsing nospace", () => {
+    it("parses whitespace instructions correctly", () => {
       const result = parseRaw(toNospace(allInstructions));
       expect(result.operations).toEqual(expectedAllInstructions);
     });
 
-    it('parses type instructions correctly', () => {
+    it("parses type instructions correctly", () => {
       const result = parseRaw(toNospace(typeInstructions));
       expect(result.operations).toEqual(expectedTypeInstructions);
     });
 
-    it('generates tokens for labels', () => {
+    it("generates tokens for labels", () => {
       const result = parseRaw(toNospace(labelInstructions));
       expect(Array.from(result.tokens.entries())).toEqual([
-        ['A', 'stn'],
-        ['B', 'ssn'],
-        ['C', 'stsn'],
-        ['D', 'sttn'],
+        ["A", "stn"],
+        ["B", "ssn"],
+        ["C", "stsn"],
+        ["D", "sttn"],
       ]);
     });
   });
