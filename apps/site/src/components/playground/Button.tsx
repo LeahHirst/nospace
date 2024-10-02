@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "@emotion/styled";
+import React from 'react';
+import styled from '@emotion/styled';
 
 /**
  * 
@@ -25,13 +25,13 @@ const Base = styled.button<{
   font-weight: 500;
   font-size: 1rem;
   align-items: center;
-  color: ${({ active }) => (active ? "#d096ff" : "white")};
+  color: ${({ active }) => (active ? '#d096ff' : 'white')};
   background-color: transparent;
-  ${({ active }) => (active ? "border-bottom: solid 2px #d096ff;" : "")}
+  ${({ active }) => (active ? 'border-bottom: solid 2px #d096ff;' : '')}
 
   &:hover {
     background-color: #262626;
-    ${({ active }) => (!active ? "border-bottom: solid 2px white;" : "")}
+    ${({ active }) => (!active ? 'border-bottom: solid 2px white;' : '')}
     cursor: pointer;
   }
 `;

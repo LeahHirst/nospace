@@ -1,10 +1,16 @@
-import { Branch, StackEffect, Type } from "./interfaces";
+import type { CodeRange, Operation } from '@repo/parser';
+import { type Branch, type StackEffect, Type } from './interfaces';
+import { produceStackEffects } from './stackEffects';
+
+export type EffectGraphNodeMeta = CodeRange & {
+  operation: Operation;
+};
 
 export type EffectGraphNode<T extends { effectType: string } = StackEffect> = {
   effect: T;
   parents: Set<EffectGraphNode>;
   children: Set<EffectGraphNode>;
-  propegate?: boolean;
+  meta?: EffectGraphNodeMeta;
 };
 
 type NodeFragment = {
@@ -16,7 +22,7 @@ export function buildEffectGraph(branches: Branch[]) {
   const branchPointers = new Map<Branch, NodeFragment>();
   const baseNode: EffectGraphNode = {
     effect: {
-      effectType: "add",
+      effectType: 'push',
       type: Type.Never,
     },
     parents: new Set(),
@@ -46,15 +52,28 @@ export function buildEffectGraph(branches: Branch[]) {
   };
 
   for (const branch of branches) {
-    const nodes = branch.effects.map((effect) => ({
-      effect,
-      parents: new Set<EffectGraphNode>(),
-      children: new Set<EffectGraphNode>(),
-    }));
+    const operationEffects = branch.operations.map<[Operation, StackEffect[]]>(
+      (op) => [op, produceStackEffects(op)],
+    );
+    const nodes: EffectGraphNode[] = [];
+    for (const [op, effects] of operationEffects) {
+      for (const effect of effects) {
+        nodes.push({
+          effect,
+          parents: new Set<EffectGraphNode>(),
+          children: new Set<EffectGraphNode>(),
+          meta: {
+            ...op.meta,
+            operation: op,
+          },
+        });
+      }
+    }
+
     nodes.forEach((node, i) => {
       if (i > 0) {
-        nodes[i - 1].children.add(node);
-        node.parents.add(nodes[i - 1]);
+        nodes[i - 1]!.children.add(node);
+        node.parents.add(nodes[i - 1]!);
       }
     });
     branchPointers.set(branch, {
@@ -95,7 +114,7 @@ export function buildEffectGraph(branches: Branch[]) {
     }
   }
 
-  const baseChildren = getHeadNodes(branches[0]);
+  const baseChildren = getHeadNodes(branches[0]!);
   for (const child of baseChildren) {
     baseNode.children.add(child);
     child.parents.add(baseNode);

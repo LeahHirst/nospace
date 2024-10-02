@@ -1,13 +1,13 @@
-import { NospaceIR } from "@repo/parser";
-import { Instruction, Operation } from "@repo/parser";
-import { parseNumber } from "./utils";
+import { NospaceIR } from '@repo/parser';
+import { Instruction, Operation } from '@repo/parser';
+import { parseNumber } from './utils';
 
 export class Program {
   private ir: NospaceIR;
 
   private inputBuffer: string;
 
-  public output: string = "";
+  public output: string = '';
 
   private stack: number[] = [];
 
@@ -30,7 +30,7 @@ export class Program {
   }
 
   public execute() {
-    this.output = "";
+    this.output = '';
     this.inputBuffer = this.input;
     this.stack = [];
     this.heap = [];

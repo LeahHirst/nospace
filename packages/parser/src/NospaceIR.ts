@@ -7,10 +7,10 @@ import {
   isLabeledOperation,
   isNumericInstruction,
   isNumericOperation,
-} from "./interfaces";
-import { parseNossembly } from "./parseNossembly";
-import { parseRaw } from "./parseRaw";
-import { irToNospace, irToWhitespace, serializeNumber } from "./utils";
+} from './interfaces';
+import { parseNossembly } from './parseNossembly';
+import { parseRaw } from './parseRaw';
+import { irToNospace, irToWhitespace, serializeNumber } from './utils';
 
 export class NospaceIR {
   public readonly operations: Operation[];
@@ -39,14 +39,14 @@ export class NospaceIR {
       if (op.instruction === Instruction.Label) {
         indent = true;
         if (lines.length > 0) {
-          lines.push("");
+          lines.push('');
         }
       }
-      const prefix = indent && op.instruction !== Instruction.Label ? "  " : "";
-      lines.push([prefix, name, op.argument].filter(Boolean).join(" "));
+      const prefix = indent && op.instruction !== Instruction.Label ? '  ' : '';
+      lines.push([prefix, name, op.argument].filter(Boolean).join(' '));
     }
 
-    return lines.join("\n");
+    return lines.join('\n');
   }
 
   toWhitespace() {
@@ -56,16 +56,16 @@ export class NospaceIR {
           (x) =>
             ![Instruction.Cast, Instruction.Assert].includes(x.instruction),
         )
-        .map((x) => this.normalizeOperation(x).filter(Boolean).join(""))
-        .join(""),
+        .map((x) => this.normalizeOperation(x).filter(Boolean).join(''))
+        .join(''),
     );
   }
 
   toNospace() {
     return irToNospace(
       this.operations
-        .map((x) => this.normalizeOperation(x).filter(Boolean).join(""))
-        .join(""),
+        .map((x) => this.normalizeOperation(x).filter(Boolean).join(''))
+        .join(''),
     );
   }
 

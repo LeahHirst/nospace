@@ -1,11 +1,11 @@
-import type { Monaco } from "./types";
-import type monaco from "monaco-editor";
+import type { Monaco } from './types';
+import type monaco from 'monaco-editor';
 
 export function registerLanguage(
   monaco: Monaco,
   id: string,
   keywords: string[],
-  tokenizer: monaco.languages.IMonarchLanguage["tokenizer"],
+  tokenizer: monaco.languages.IMonarchLanguage['tokenizer'],
 ) {
   if (!monaco) {
     return;

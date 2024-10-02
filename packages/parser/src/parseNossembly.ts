@@ -2,13 +2,13 @@ import {
   Instruction,
   Operation,
   IRArgs,
-  TokenMap,
   isNumericInstruction,
-  NumericOperation,
   isLabelledInstruction,
   ParseError,
-} from "./interfaces";
-import { serializeNumber } from "./utils";
+  Type,
+  isTypeInstruction,
+} from './interfaces';
+import { serializeNumber } from './utils';
 
 function hasPragma(line: string) {
   return /^#(if|define)/.test(line);
@@ -17,26 +17,27 @@ function hasPragma(line: string) {
 export function parseNossembly(nossembly: string): IRArgs {
   const operations: Operation[] = [];
   const tokens: Map<string, string> = new Map();
+  const types: Record<string, string> = Type;
   const errors: ParseError[] = [];
   const globals: Map<string, string> = new Map();
 
-  nossembly.split("\n").forEach((line, lineNum) => {
-    if (!line.trim() || line.trim().startsWith("# ")) {
+  nossembly.split('\n').forEach((line, lineNum) => {
+    if (!line.trim() || line.trim().startsWith('# ')) {
       return;
     }
 
-    let parts = line.trim().replace(/# /g, "").split(" ");
+    let parts = line.trim().replace(/# /g, '').split(' ');
 
     if (hasPragma(line)) {
       const [pragma, key, value, ...rest] = parts;
 
       if (!key || !value) {
         errors.push({
-          type: "pragma",
-          message: "Pragmas must specify both a key and value",
+          type: 'pragma',
+          message: 'Pragmas must specify both a key and value',
           meta: {
             startLn: lineNum,
-            startCol: line.indexOf(pragma ?? ""),
+            startCol: line.indexOf(pragma ?? ''),
             endCol: line.length,
             endLn: lineNum,
           },
@@ -45,20 +46,20 @@ export function parseNossembly(nossembly: string): IRArgs {
       }
 
       switch (pragma) {
-        case "#if": {
+        case '#if': {
           if (globals.get(key) !== value) {
             return;
           }
           parts = rest;
         }
-        case "#define": {
+        case '#define': {
           if (rest.length > 0) {
             errors.push({
-              type: "pragma",
-              message: "Incorrect number of arguments for #define pragma",
+              type: 'pragma',
+              message: 'Incorrect number of arguments for #define pragma',
               meta: {
                 startLn: lineNum,
-                startCol: line.indexOf(pragma ?? ""),
+                startCol: line.indexOf(pragma ?? ''),
                 endCol: line.length,
                 endLn: lineNum,
               },
@@ -71,11 +72,11 @@ export function parseNossembly(nossembly: string): IRArgs {
         }
         default: {
           errors.push({
-            type: "pragma",
+            type: 'pragma',
             message: `Unknown pragma "${pragma}"`,
             meta: {
               startLn: lineNum,
-              startCol: line.indexOf(pragma ?? ""),
+              startCol: line.indexOf(pragma ?? ''),
               endCol: line.length,
               endLn: lineNum,
             },
@@ -92,11 +93,11 @@ export function parseNossembly(nossembly: string): IRArgs {
 
     if (!instruction) {
       errors.push({
-        type: "unknown_instruction",
+        type: 'unknown_instruction',
         message: `Unrecognized instruction "${instructionName}"`,
         meta: {
           startLn: lineNum,
-          startCol: line.indexOf(instructionName ?? ""),
+          startCol: line.indexOf(instructionName ?? ''),
           endCol: line.length,
           endLn: lineNum,
         },
@@ -106,12 +107,33 @@ export function parseNossembly(nossembly: string): IRArgs {
 
     const meta = {
       startLn: lineNum,
-      startCol: line.indexOf(instructionName ?? ""),
+      startCol: line.indexOf(instructionName ?? ''),
       endLn: lineNum,
       endCol: line.length,
     };
 
-    if (isNumericInstruction(instruction)) {
+    if (isTypeInstruction(instruction)) {
+      if (!arg) {
+        errors.push({
+          type: 'argument',
+          message: `You must specify a type`,
+          meta: {
+            startLn: lineNum,
+            startCol: line.indexOf(instructionName ?? ''),
+            endCol: line.length,
+            endLn: lineNum,
+          },
+        });
+        return;
+      }
+
+      types[arg] ??= serializeNumber(10 + Object.keys(types).length);
+      operations.push({
+        instruction,
+        argument: types[arg],
+        meta,
+      });
+    } else if (isNumericInstruction(instruction)) {
       operations.push({
         instruction,
         argument: Number(arg),
@@ -120,11 +142,11 @@ export function parseNossembly(nossembly: string): IRArgs {
     } else if (isLabelledInstruction(instruction)) {
       if (!arg) {
         errors.push({
-          type: "argument",
+          type: 'argument',
           message: `An argument must be provided to the ${instructionName} instruction`,
           meta: {
             startLn: lineNum,
-            startCol: line.indexOf(instructionName ?? ""),
+            startCol: line.indexOf(instructionName ?? ''),
             endCol: line.length,
             endLn: lineNum,
           },

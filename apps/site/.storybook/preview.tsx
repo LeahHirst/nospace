@@ -1,6 +1,6 @@
-import React from "react";
-import { Global, css } from "@emotion/react";
-import type { Preview } from "@storybook/react";
+import React from 'react';
+import { Global, css } from '@emotion/react';
+import type { Preview } from '@storybook/react';
 
 export const decorators = [
   (Story) => (
@@ -12,7 +12,7 @@ export const decorators = [
           input,
           textarea {
             font-family: -apple-system, BlinkMacSystemFont, Roboto,
-              "Helvetica Neue", sans-serif;
+              'Helvetica Neue', sans-serif;
           }
         `}
       />
