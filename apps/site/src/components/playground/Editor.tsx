@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Editor as MonacoEditor, useMonaco, type Monaco } from '@monaco-editor/react';
+import { Editor as MonacoEditor, useMonaco } from '@monaco-editor/react';
 import styled from '@emotion/styled';
-import { NospaceIR, Instruction } from '@repo/parser';
+import { NospaceIR } from '@repo/parser';
 import Button from './Button';
 import Dropdown, { DropdownAction } from './Dropdown';
 import { registerNospace, registerWhitespace, registerNossembly } from '@repo/language-support'
@@ -65,16 +65,46 @@ export default function Editor() {
     }
 
     const editor = monaco.editor.getEditors()[0];
-    
-    editor.onDidChangeCursorPosition((e) => {
-      setCursorPos([e.position.lineNumber, e.position.column]);
-    });
+
     registerNospace(monaco);
     registerWhitespace(monaco);
     registerNossembly(monaco);
 
     monaco.editor.setModelLanguage(editor.getModel()!, 'nossembly');
   }, [monaco]);
+
+  const highlightErrors = React.useCallback((lang: string) => {
+    if (!monaco) {
+      return;
+    }
+
+    const editor = monaco.editor.getEditors()[0];
+
+    // Todo: debounce
+    const parsed = getProgram(lang, editor.getValue());
+    monaco.editor.setModelMarkers(editor.getModel()!, 'owner', []);
+    monaco.editor.setModelMarkers(editor.getModel()!, 'owner', parsed.parseErrors.map(error => ({
+      startLineNumber: error.meta.startLn + 1,
+      endLineNumber: error.meta.endLn + 1,
+      startColumn: error.meta.startCol + 1,
+      endColumn: error.meta.endCol + 1,
+      message: `ParseError: ${error.message}`,
+      severity: monaco.MarkerSeverity.Error,
+    })));
+  }, [monaco, language]);
+
+  React.useEffect(() => {
+    if (!monaco) {
+      return;
+    }
+
+    const editor = monaco.editor.getEditors()[0];
+
+    editor.onDidChangeCursorPosition((e) => {
+      setCursorPos([e.position.lineNumber, e.position.column]);
+      highlightErrors(language);
+    });
+  }, [monaco, language, highlightErrors]);
 
   const changeLanguage = React.useCallback((lang: string) => {
     if (!monaco) {
@@ -98,16 +128,6 @@ export default function Editor() {
       text,
       forceMoveMarkers: true,
     }]);
-    monaco.editor.setModelMarkers(editor.getModel()!, 'owner', [
-      {
-        startLineNumber: lnNumber,
-        endLineNumber: lnNumber,
-        startColumn: colNumber,
-        endColumn: colNumber + 1,
-        message: 'TypeError',
-        severity: monaco.MarkerSeverity.Error,
-      },
-    ]);
   }, [monaco, lnNumber, colNumber]);
 
   const monacoOptions = useMemo(() => ({
@@ -123,17 +143,8 @@ export default function Editor() {
       nonBasicASCII: false,
       ambiguousCharacters: false,
     },
+    insertSpaces: false,
   } as editor.IStandaloneEditorConstructionOptions), []);
-
-  useEffect(() => {
-    if (!monaco) {
-      return;
-    }
-
-    monaco.editor.getEditors()[0].updateOptions({
-      autoIndent: language === 'Nossembly' ? 'advanced' : 'none',
-    });
-  }, [monaco, language]);
 
   return (
     <Container>
@@ -144,8 +155,14 @@ export default function Editor() {
               key={lang}
               active={language === lang}
               onClick={() => {
-                monaco?.editor.setModelLanguage(monaco.editor.getEditors()[0].getModel()!, lang.toLowerCase());
+                const editor = monaco?.editor.getEditors()[0];
+                monaco?.editor.setModelLanguage(editor?.getModel()!, lang.toLowerCase());
+                editor?.updateOptions({
+                  autoIndent: lang === 'Nossembly' ? 'advanced' : 'none',
+                  fontSize: lang === 'Nossembly' ? 16.0001 : 16, // horrible hack to force Monaco to update options immediately
+                });
                 changeLanguage(lang);
+                highlightErrors(lang);
               }}
             >
               {lang}
