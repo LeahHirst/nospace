@@ -9,6 +9,8 @@ Nospace is an [esoteric programming language](https://en.wikipedia.org/wiki/Esot
 
 In addition to types, Nospace provides lexical aliasing of spaces with zero-width spaces (`​`), tabs with zero-width non-joiners (`‌`), and feed lines with zero-width joiners (`‍`). These changes allow for the creation of zero-width, single lined programs for worsened readability.
 
+Try out Nospace in your browser at [the playground](https://nospacelang.org/play)!
+
 ## Hello world
 
 The following is a simple hello world program in Nospace:
@@ -48,10 +50,7 @@ Items stored and retrieved in the heap are untyped (i.e. have an `Any` type). Ty
 
 ## Roadmap
 
-- [ ] Useful error messaging - nospace will tell you that your program does not typecheck, but figuring out why is very difficult, particularly if your program has no width
-- [ ] Typechecker built in Nospace/Whitespace
-- [ ] Persisting of type on duplication
-- [ ] Subroutine support
+- [ ] Nospace typechecker/compiler built in Nospace
 
 ## Commands
 
