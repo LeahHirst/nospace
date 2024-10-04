@@ -82,7 +82,7 @@ export default function Editor() {
     registerWhitespace(monaco);
     registerNossembly(monaco);
 
-    monaco.editor.setModelLanguage(editor.getModel()!, 'nossembly');
+    monaco.editor.setModelLanguage(editor.getModel()!, 'nospace');
   }, [monaco]);
 
   const highlightErrors = React.useCallback(

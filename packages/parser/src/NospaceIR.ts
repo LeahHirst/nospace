@@ -43,7 +43,9 @@ export class NospaceIR {
         }
       }
       const prefix = indent && op.instruction !== Instruction.Label ? '  ' : '';
-      lines.push([prefix, name, op.argument].filter(Boolean).join(' '));
+      lines.push(
+        [prefix, name, op.argument].filter((x) => x !== undefined).join(' '),
+      );
     }
 
     return lines.join('\n');
