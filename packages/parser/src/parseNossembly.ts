@@ -17,7 +17,7 @@ function hasPragma(line: string) {
 export function parseNossembly(nossembly: string): IRArgs {
   const operations: Operation[] = [];
   const tokens: Map<string, string> = new Map();
-  const types: Record<string, string> = Type;
+  const types: Record<string, string> = structuredClone(Type);
   const errors: ParseError[] = [];
   const globals: Map<string, string> = new Map();
 
@@ -40,6 +40,7 @@ export function parseNossembly(nossembly: string): IRArgs {
             startCol: line.indexOf(pragma ?? ''),
             endCol: line.length,
             endLn: lineNum,
+            instructionName: pragma ?? '',
           },
         });
         return;
@@ -62,6 +63,7 @@ export function parseNossembly(nossembly: string): IRArgs {
                 startCol: line.indexOf(pragma ?? ''),
                 endCol: line.length,
                 endLn: lineNum,
+                instructionName: '#define',
               },
             });
             return;
@@ -79,6 +81,7 @@ export function parseNossembly(nossembly: string): IRArgs {
               startCol: line.indexOf(pragma ?? ''),
               endCol: line.length,
               endLn: lineNum,
+              instructionName: pragma ?? '',
             },
           });
           return;
@@ -100,6 +103,7 @@ export function parseNossembly(nossembly: string): IRArgs {
           startCol: line.indexOf(instructionName ?? ''),
           endCol: line.length,
           endLn: lineNum,
+          instructionName: instructionName ?? '',
         },
       });
       return;
@@ -110,6 +114,7 @@ export function parseNossembly(nossembly: string): IRArgs {
       startCol: line.indexOf(instructionName ?? ''),
       endLn: lineNum,
       endCol: line.length,
+      instructionName: instructionName ?? '',
     };
 
     if (isTypeInstruction(instruction)) {
@@ -122,6 +127,7 @@ export function parseNossembly(nossembly: string): IRArgs {
             startCol: line.indexOf(instructionName ?? ''),
             endCol: line.length,
             endLn: lineNum,
+            instructionName: instructionName ?? '',
           },
         });
         return;
@@ -131,7 +137,10 @@ export function parseNossembly(nossembly: string): IRArgs {
       operations.push({
         instruction,
         argument: types[arg],
-        meta,
+        meta: {
+          ...meta,
+          typeName: arg,
+        },
       });
     } else if (isNumericInstruction(instruction)) {
       operations.push({
@@ -149,6 +158,7 @@ export function parseNossembly(nossembly: string): IRArgs {
             startCol: line.indexOf(instructionName ?? ''),
             endCol: line.length,
             endLn: lineNum,
+            instructionName: instructionName ?? '',
           },
         });
         return;

@@ -7,6 +7,7 @@ import {
   isLabelledInstruction,
   ParseError,
   isTypeInstruction,
+  Type,
 } from './interfaces';
 import { irToNospace, irToWhitespace } from './utils';
 
@@ -83,6 +84,7 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
 
   const operations: Operation[] = [];
   const tokens: TokenMap = new Map();
+  const types: Record<string, string> = structuredClone(Type);
   const errors: ParseError[] = [];
   let instruction: Instruction | undefined = undefined;
   let buf: string = '';
@@ -108,12 +110,25 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
             startCol,
             endCol: col,
             endLn: ln,
+            instructionName:
+              Object.entries(Instruction).find(
+                ([_k, v]) => v === instruction,
+              )?.[0] ?? '',
           };
           if (isTypeInstruction(instruction)) {
+            const typeName =
+              Object.entries(types).find(([_k, v]) => v === buf)?.[0] ??
+              `Type${generateToken(Object.keys(types).length - Object.keys(Type).length)}`;
+            types[typeName] ??= buf;
             operations.push({
               instruction,
-              argument: buf,
-              meta,
+              argument: typeName,
+              meta: {
+                ...meta,
+                typeName: ignoreNospace
+                  ? irToWhitespace(buf)
+                  : irToNospace(buf),
+              },
             });
           } else if (isNumericInstruction(instruction)) {
             operations.push({
@@ -159,6 +174,7 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
               startCol,
               endCol: col,
               endLn: ln,
+              instructionName: instruction,
             },
           });
           startLn = ln;
@@ -175,6 +191,7 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
             startCol: startCol,
             endLn: ln,
             endCol: col,
+            instructionName: buf,
           },
         });
       }
@@ -190,6 +207,7 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
         startCol: startCol,
         endLn: ln,
         endCol: col,
+        instructionName: buf,
       },
     });
   }

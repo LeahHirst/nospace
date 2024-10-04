@@ -91,11 +91,11 @@ const expectedAllInstructions = [
 const expectedTypeInstructions = [
   {
     instruction: Instruction.Cast,
-    argument: 'A',
+    argument: 'TypeA',
   },
   {
     instruction: Instruction.Assert,
-    argument: 'A',
+    argument: 'TypeA',
   },
 ].map((x) => ({ ...x, meta: expect.any(Object) }));
 
@@ -154,9 +154,7 @@ describe('parseRaw', () => {
 
     it('parses type instructions correctly', () => {
       const result = parseRaw(toNospace(typeInstructions));
-      expect(result.operations).toEqual(
-        expectedTypeInstructions.map((x) => ({ ...x, argument: 'ststn' })),
-      );
+      expect(result.operations).toEqual(expectedTypeInstructions);
     });
 
     it('generates tokens for labels', () => {

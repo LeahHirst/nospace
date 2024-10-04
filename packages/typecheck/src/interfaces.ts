@@ -1,4 +1,4 @@
-import type { Operation, CodeRange } from '@repo/parser';
+import type { Operation, CodeMeta } from '@repo/parser';
 
 export enum Type {
   Never = 'ttn',
@@ -55,7 +55,7 @@ export type StackEffectNode = {
 
 type Info = {
   message: string;
-  meta: CodeRange;
+  meta: CodeMeta;
 };
 
 export type AssertionError = Info & {
@@ -66,7 +66,11 @@ export type TypeMismatchError = Info & {
   type: 'mismatch';
 };
 
-export type TypeError = AssertionError | TypeMismatchError;
+export type UnderflowError = Info & {
+  type: 'underflow';
+};
+
+export type TypeError = AssertionError | TypeMismatchError | UnderflowError;
 
 export type UnreachableWarning = Info & {
   type: 'unreachable';

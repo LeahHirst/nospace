@@ -26,7 +26,6 @@ const Toolbar = styled.div`
   background-color: #262626;
   color: #c3c3c3;
   padding: 0 20px;
-  border-bottom: solid 5px #1e1e1e;
 `;
 
 const Flex = styled.div`
@@ -147,11 +146,11 @@ export default function Editor() {
       }
 
       const editor = monaco.editor.getEditors()[0];
-      const program = getProgram(lang, editor.getValue());
+      const program = getProgram(language, editor.getValue());
       editor.setValue(serializeProgram(lang, program));
       setLanguage(lang);
     },
-    [monaco],
+    [monaco, language],
   );
 
   const insert = React.useCallback(
