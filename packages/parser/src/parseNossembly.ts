@@ -143,6 +143,20 @@ export function parseNossembly(nossembly: string): IRArgs {
         },
       });
     } else if (isNumericInstruction(instruction)) {
+      if (!arg) {
+        errors.push({
+          type: 'argument',
+          message: `An argument must be provided to the ${instructionName} instruction`,
+          meta: {
+            startLn: lineNum,
+            startCol: line.indexOf(instructionName ?? ''),
+            endCol: line.length,
+            endLn: lineNum,
+            instructionName: instructionName ?? '',
+          },
+        });
+        return;
+      }
       operations.push({
         instruction,
         argument: Number(arg),

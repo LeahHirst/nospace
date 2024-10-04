@@ -1,5 +1,5 @@
 export function serializeNumber(n: number) {
-  return `s${n.toString(2).replace(/0/g, 's').replace(/1/g, 't')}n`;
+  return `${n < 0 ? 't' : 's'}${Math.abs(n).toString(2).replace(/0/g, 's').replace(/1/g, 't')}n`;
 }
 
 export function parseNumber(serialized: string) {

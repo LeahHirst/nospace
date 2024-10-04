@@ -4,7 +4,7 @@ import type { Monaco } from './types';
 
 export function registerNospace(monaco: Monaco) {
   const keywords = Object.values(Instruction)
-    .filter((x) => x === Instruction.UnknownInstruction)
+    .filter((x) => x !== Instruction.UnknownInstruction)
     .map((x) =>
       x
         .replace(/s/g, '\u200B')
