@@ -25,7 +25,7 @@ export enum Instruction {
   Retrieve = 'ttt',
   Cast = 'xs',
   Assert = 'xt',
-  Unknown = 'unknown',
+  UnknownInstruction = 'unknown',
 }
 
 export const LabelledInstructions = [
@@ -44,23 +44,25 @@ export const NumericInstructions = [
 
 export const TypeInstructions = [Instruction.Cast, Instruction.Assert] as const;
 
-export type CodeRange = {
+export type CodeMeta = {
   startLn: number;
   endLn: number;
   startCol: number;
   endCol: number;
+  instructionName: string;
+  typeName?: string;
 };
 
 type OperationBase<I extends Instruction, A = undefined> = A extends undefined
   ? {
       instruction: I;
       argument?: A;
-      meta: CodeRange;
+      meta: CodeMeta;
     }
   : {
       instruction: I;
       argument: A;
-      meta: CodeRange;
+      meta: CodeMeta;
     };
 
 export type NumericOperation = OperationBase<
@@ -91,7 +93,7 @@ export type Operation =
 
 type Error = {
   message: string;
-  meta: CodeRange;
+  meta: CodeMeta;
 };
 
 export type UnknownInstructionError = Error & {
@@ -106,7 +108,15 @@ export type PragmaError = Error & {
   type: 'pragma';
 };
 
-export type ParseError = UnknownInstructionError | ArgumentError | PragmaError;
+export type DuplicatedLabelError = Error & {
+  type: 'duplicated_label';
+};
+
+export type ParseError =
+  | UnknownInstructionError
+  | ArgumentError
+  | PragmaError
+  | DuplicatedLabelError;
 
 export enum Type {
   Never = 'ttn',

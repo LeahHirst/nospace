@@ -3,13 +3,15 @@ import { registerLanguage } from './common';
 import type { Monaco } from './types';
 
 export function registerNospace(monaco: Monaco) {
-  const keywords = Object.values(Instruction).map((x) =>
-    x
-      .replace(/s/g, '\u200B')
-      .replace(/t/g, '\u200C')
-      .replace(/n/g, '\u200D')
-      .replace(/x/g, '\u2060'),
-  );
+  const keywords = Object.values(Instruction)
+    .filter((x) => x === Instruction.UnknownInstruction)
+    .map((x) =>
+      x
+        .replace(/s/g, '\u200B')
+        .replace(/t/g, '\u200C')
+        .replace(/n/g, '\u200D')
+        .replace(/x/g, '\u2060'),
+    );
   registerLanguage(monaco, 'nospace', keywords, {
     root: [
       [

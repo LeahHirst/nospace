@@ -3,7 +3,9 @@ import { registerLanguage } from './common';
 import type { Monaco } from './types';
 
 export function registerNossembly(monaco: Monaco) {
-  const keywords = Object.keys(Instruction);
+  const keywords = Object.keys(Instruction).filter(
+    (x) => x === Instruction.UnknownInstruction,
+  );
   registerLanguage(monaco, 'nossembly', keywords, {
     root: [
       [

@@ -1,8 +1,8 @@
-import type { CodeRange, Operation } from '@repo/parser';
+import type { CodeMeta, Operation } from '@repo/parser';
 import { type Branch, type StackEffect, Type } from './interfaces';
 import { produceStackEffects } from './stackEffects';
 
-export type EffectGraphNodeMeta = CodeRange & {
+export type EffectGraphNodeMeta = CodeMeta & {
   operation: Operation;
 };
 

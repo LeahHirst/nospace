@@ -1,10 +1,14 @@
 import { NospaceIR } from '@repo/parser';
 import { Typechecker } from '../Typecheck';
+import { diagram } from '../utils/diagram';
 
-function result(nsa: string) {
+function result(nsa: string, generateDiagram = false) {
   const ir = NospaceIR.fromNossembly(nsa);
   const tc = new Typechecker(ir);
   const [success] = tc.typecheck();
+  if (generateDiagram) {
+    console.log('Diagram:', diagram(tc.rootNode!));
+  }
   return success;
 }
 
@@ -209,17 +213,18 @@ describe('Typechecker', () => {
           expect(
             result(`
             Push 1
-            Push 1
             JumpZero A
             Push 1
             Cast CustomType
             Jump B
 
             Label A
+              Push 1
               Cast Int
               Jump C
 
             Label B
+              Push 1
               Cast Char
               Jump C
 
@@ -235,7 +240,8 @@ describe('Typechecker', () => {
       describe('if no branch condition matches', () => {
         it('fails', () => {
           expect(
-            result(`
+            result(
+              `
             Push 1
             Push 1
             JumpZero B
@@ -250,7 +256,9 @@ describe('Typechecker', () => {
 
             Label C
               Assert CustomC
-          `),
+          `,
+              true,
+            ),
           ).toBeFalsy();
         });
       });
@@ -274,7 +282,8 @@ describe('Typechecker', () => {
       describe('loop with recursive type', () => {
         it('passes when asserting recursive type', () => {
           expect(
-            result(`
+            result(
+              `
             Push 1
             Cast Int
             Label A
@@ -287,7 +296,9 @@ describe('Typechecker', () => {
               Assert CustomA
               Pop
               Assert CustomA
-          `),
+          `,
+              true,
+            ),
           ).toBeTruthy();
         });
 

@@ -96,6 +96,54 @@ function resolves(
   return hasResolved;
 }
 
+const EMPTY_META = {
+  startLn: 0,
+  startCol: 0,
+  endLn: 0,
+  endCol: 0,
+  instructionName: '',
+};
+
+function buildTypeError(node: EffectGraphNode): TypeError {
+  const stackTypes = Array.from(
+    new Set(
+      Array.from(node.parents)
+        .filter((x) => x.effect.effectType === 'push' && !!x.meta)
+        .sort((a, b) => (a.meta?.startLn ?? 0) - (b.meta?.startLn ?? 0)),
+    ),
+  ) as unknown as EffectGraphNode<PushEffect>[];
+
+  if (stackTypes.length === 0) {
+    return {
+      type: 'underflow',
+      message: `Cannot perform ${node.meta?.instructionName.toLowerCase()} as this would result in a stack underflow.`,
+      meta: node.meta ?? EMPTY_META,
+    };
+  }
+
+  const origins = stackTypes
+    .map(
+      (x) =>
+        `"${x.meta?.typeName}" comes from L${(x.meta?.startLn ?? 0) + 1}:${x.meta?.startCol ?? 0}.`,
+    )
+    .join('\n');
+  const unionedTypes = stackTypes.map((x) => x.meta?.typeName).join(' | ');
+
+  if (node.effect.effectType === 'assert') {
+    return {
+      type: 'mismatch',
+      message: `Attempted to assert type "${node.meta?.typeName}", but the top item of the stack is of type "${unionedTypes}".\n\n${origins}`,
+      meta: node.meta ?? EMPTY_META,
+    };
+  }
+
+  return {
+    type: 'mismatch',
+    message: `Cannot perform ${node.meta?.instructionName.toLowerCase()} as the top item on the stack is of type "${unionedTypes}".\n\n${origins}`,
+    meta: node.meta ?? EMPTY_META,
+  };
+}
+
 export function resolveTypeGraph(
   rootNode: EffectGraphNode<StackEffect>,
 ): TypeError[] {
@@ -110,16 +158,7 @@ export function resolveTypeGraph(
       }
     }
     if (!progressed) {
-      return Array.from(nodesToResolve).map((node) => ({
-        type: 'mismatch',
-        message: `This operation cannot be performed on the stack`,
-        meta: node.meta ?? {
-          startLn: 0,
-          startCol: 0,
-          endLn: 0,
-          endCol: 0,
-        },
-      }));
+      return Array.from(nodesToResolve).map(buildTypeError);
     }
   }
 

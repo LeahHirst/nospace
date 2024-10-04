@@ -4,7 +4,14 @@ import type { Monaco } from './types';
 
 export function registerWhitespace(monaco: Monaco) {
   const keywords = Object.values(Instruction)
-    .filter((x) => ![Instruction.Cast, Instruction.Assert].includes(x))
+    .filter(
+      (x) =>
+        ![
+          Instruction.UnknownInstruction,
+          Instruction.Cast,
+          Instruction.Assert,
+        ].includes(x),
+    )
     .map((x) => x.replace(/s/g, ' ').replace(/t/g, '\t').replace(/n/g, '\n'));
   registerLanguage(monaco, 'whitespace', keywords, {
     root: [

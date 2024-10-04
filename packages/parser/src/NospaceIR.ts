@@ -5,8 +5,8 @@ import {
   ParseError,
   TokenMap,
   isLabeledOperation,
-  isNumericInstruction,
   isNumericOperation,
+  isTypeOperation,
 } from './interfaces';
 import { parseNossembly } from './parseNossembly';
 import { parseRaw } from './parseRaw';
@@ -87,6 +87,10 @@ export class NospaceIR {
   private normalizeOperation(
     operation: Operation,
   ): [Instruction, string | undefined] {
+    if (isTypeOperation(operation)) {
+      return [operation.instruction, operation.argument];
+    }
+
     if (isNumericOperation(operation)) {
       return [operation.instruction, serializeNumber(operation.argument)];
     }
