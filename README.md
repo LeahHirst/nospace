@@ -1,4 +1,9 @@
-﻿# nospace
+<p>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/LeahHirst/nospace/refs/heads/main/.github/assets/logo-dark.svg">
+    <img alt="Nospace" src="https://raw.githubusercontent.com/LeahHirst/nospace/refs/heads/main/.github/assets/logo-light.svg" width="230">
+  </picture>
+</p>
 
 [![GitHub Actions CI](https://github.com/LeahHirst/nospace/workflows/CI/badge.svg)](https://github.com/LeahHirst/nospace/actions?query=workflow%3ACI)
 [![npm version](https://badge.fury.io/js/nospace.svg)](https://www.npmjs.com/package/nospace)
