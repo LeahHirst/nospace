@@ -11,6 +11,7 @@ import {
 import type { editor } from 'monaco-editor';
 import { Typechecker } from '@repo/typecheck/index';
 import { getProgram, serializeProgram } from './utils/program';
+import { getSharedCode } from './utils/share';
 
 const Container = styled.div`
   display: flex;
@@ -45,6 +46,7 @@ export default function Editor() {
   const monaco = useMonaco();
   const [language, setLanguage] = useState('Nospace');
   const [[lnNumber, colNumber], setCursorPos] = useState([1, 1]);
+  const { code } = useMemo(() => getSharedCode(), []);
 
   useEffect(() => {
     if (!monaco) {
@@ -205,7 +207,11 @@ export default function Editor() {
           </Dropdown>
         </Flex>
       </Toolbar>
-      <MonacoEditor defaultValue="" theme="vs-dark" options={monacoOptions} />
+      <MonacoEditor
+        defaultValue={code}
+        theme="vs-dark"
+        options={monacoOptions}
+      />
       <Toolbar>
         <div />
         Ln {lnNumber}, Col {colNumber}

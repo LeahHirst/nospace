@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import Dropdown, { DropdownAction } from './Dropdown';
 import Button from './Button';
@@ -31,8 +31,35 @@ const RightActions = styled.div`
   padding-right: 16px;
 `;
 
+const ShareToast = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 35px;
+  padding: 20px 40px;
+  margin-left: -142px;
+  margin-top: -31px;
+  font-size: 1.2rem;
+  z-index: 100000;
+`;
+
 export default function Header() {
-  const { run } = usePlaygroundContext();
+  const { run, share } = usePlaygroundContext();
+  const [showToast, setShowToast] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout>();
+
+  const shareCode = useCallback(() => {
+    setShowToast(true);
+    timeoutRef.current = setTimeout(() => {
+      setShowToast(false);
+    }, 2000);
+    share();
+    return () => {
+      clearTimeout(timeoutRef.current);
+    };
+  }, [share]);
 
   return (
     <Base>
@@ -45,8 +72,9 @@ export default function Header() {
       </Flex>
       <RightActions>
         <Button onClick={run}>Run</Button>
-        <Button>Share</Button>
+        <Button onClick={shareCode}>Share</Button>
       </RightActions>
+      {showToast && <ShareToast>URL copied to clipboard</ShareToast>}
     </Base>
   );
 }
