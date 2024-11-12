@@ -91,11 +91,11 @@ const expectedAllInstructions = [
 const expectedTypeInstructions = [
   {
     instruction: Instruction.Cast,
-    argument: 'TypeA',
+    argument: 'ststn',
   },
   {
     instruction: Instruction.Assert,
-    argument: 'TypeA',
+    argument: 'ststn',
   },
 ].map((x) => ({ ...x, meta: expect.any(Object) }));
 
