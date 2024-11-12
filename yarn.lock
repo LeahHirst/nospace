@@ -2943,9 +2943,9 @@ ast-types@^0.16.1:
   dependencies:
     tslib "^2.0.1"
 
-astro@^4.15.4:
+astro@^4.16.10:
   version "4.16.10"
-  resolved "https://registry.npmjs.org/astro/-/astro-4.16.10.tgz"
+  resolved "https://registry.yarnpkg.com/astro/-/astro-4.16.10.tgz#8495947d6e405104f312ee06643a44078c22fc0c"
   integrity sha512-a+nB4bZE50NXHLzVXUHtx/lYct2Aa8kbqZnWNrWqkU97RuhBuWJ5H5/LQbKRnBWGvqChKfJBiMWJe53TY9ieYQ==
   dependencies:
     "@astrojs/compiler" "^2.10.3"
