@@ -10,6 +10,7 @@ import {
 import { getProgram } from './utils/program';
 import { Typechecker } from '@repo/typecheck/index';
 import { Program } from '@repo/nose/index';
+import { generateShareHashParameter, getSharedCode } from './utils/share';
 
 export type CompilerMessage = {
   message: string;
@@ -22,6 +23,7 @@ export type PlaygroundContextType = {
   programOutput: string;
   compilerOutput: CompilerMessage[];
   run: () => void;
+  share: () => void;
 };
 
 const PlaygroundContext = createContext<PlaygroundContextType>({
@@ -30,6 +32,7 @@ const PlaygroundContext = createContext<PlaygroundContextType>({
   programOutput: '',
   compilerOutput: [],
   run: () => {},
+  share: () => {},
 });
 
 export const usePlaygroundContext = () => useContext(PlaygroundContext);
@@ -39,7 +42,8 @@ export const PlaygroundContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [programInput, setProgramInput] = useState('');
+  const { input } = useMemo(() => getSharedCode(), []);
+  const [programInput, setProgramInput] = useState(input);
   const [programOutput, setProgramOutput] = useState('');
   const [compilerOutput, setCompilerOutput] = useState<CompilerMessage[]>([]);
 
@@ -91,6 +95,17 @@ export const PlaygroundContextProvider = ({
     setProgramOutput(output);
   }, [monaco]);
 
+  const share = useCallback(() => {
+    if (!monaco) {
+      return;
+    }
+
+    const editor = monaco.editor.getEditors()[0];
+
+    const hash = generateShareHashParameter(editor.getValue(), programInput);
+    location.hash = hash;
+  }, [monaco, programInput]);
+
   const value = useMemo(
     () => ({
       programInput,
@@ -98,8 +113,9 @@ export const PlaygroundContextProvider = ({
       programOutput,
       compilerOutput,
       run,
+      share,
     }),
-    [programInput, programOutput, compilerOutput, run],
+    [programInput, programOutput, compilerOutput, run, share],
   );
 
   return (
