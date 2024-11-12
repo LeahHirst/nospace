@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Editor as MonacoEditor, useMonaco } from '@monaco-editor/react';
 import styled from '@emotion/styled';
-import { NospaceIR } from '@repo/parser';
 import Button from './Button';
 import Dropdown, { DropdownAction } from './Dropdown';
 import {
@@ -11,12 +10,14 @@ import {
 } from '@repo/language-support';
 import type { editor } from 'monaco-editor';
 import { Typechecker } from '@repo/typecheck/index';
+import { getProgram, serializeProgram } from './utils/program';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
   color: #c8b1db;
+  flex: 1;
 `;
 
 const Toolbar = styled.div`
@@ -40,32 +41,6 @@ Label Test
   WriteInt
 `;
 
-function getProgram(lang: string, code: string) {
-  switch (lang) {
-    case 'Nospace':
-      return NospaceIR.fromNospace(code);
-    case 'Whitespace':
-      return NospaceIR.fromWhitespace(code);
-    case 'Nossembly':
-      return NospaceIR.fromNossembly(code);
-    default:
-      throw new Error('Unrecognized language');
-  }
-}
-
-function serializeProgram(lang: string, prog: NospaceIR) {
-  switch (lang) {
-    case 'Nospace':
-      return prog.toNospace();
-    case 'Whitespace':
-      return prog.toWhitespace();
-    case 'Nossembly':
-      return prog.toNossembly();
-    default:
-      throw new Error('Unrecognized language');
-  }
-}
-
 export default function Editor() {
   const monaco = useMonaco();
   const [language, setLanguage] = useState('Nospace');
@@ -85,43 +60,43 @@ export default function Editor() {
     monaco.editor.setModelLanguage(editor.getModel()!, 'nospace');
   }, [monaco]);
 
-  const highlightErrors = React.useCallback(
-    (lang: string) => {
-      if (!monaco) {
-        return;
+  const highlightErrors = React.useCallback(() => {
+    if (!monaco) {
+      return;
+    }
+
+    const editor = monaco.editor.getEditors()[0];
+
+    // Todo: debounce
+    const parsed = getProgram(
+      editor.getModel()?.getLanguageId() ?? 'nospace',
+      editor.getValue(),
+    );
+    const markers: editor.IMarkerData[] = parsed.parseErrors.map((error) => ({
+      startLineNumber: error.meta.startLn + 1,
+      endLineNumber: error.meta.endLn + 1,
+      startColumn: error.meta.startCol + 1,
+      endColumn: error.meta.endCol + 1,
+      message: `ParseError: ${error.message}`,
+      severity: monaco.MarkerSeverity.Error,
+    }));
+
+    const [typechecked, typeErrors] = new Typechecker(parsed).typecheck();
+    if (!typechecked) {
+      for (const error of typeErrors.errors) {
+        markers.push({
+          startLineNumber: error.meta.startLn + 1,
+          endLineNumber: error.meta.endLn + 1,
+          startColumn: error.meta.startCol + 1,
+          endColumn: error.meta.endCol + 1,
+          message: `TypeError: ${error.message}`,
+          severity: monaco.MarkerSeverity.Error,
+        });
       }
+    }
 
-      const editor = monaco.editor.getEditors()[0];
-
-      // Todo: debounce
-      const parsed = getProgram(lang, editor.getValue());
-      const markers: editor.IMarkerData[] = parsed.parseErrors.map((error) => ({
-        startLineNumber: error.meta.startLn + 1,
-        endLineNumber: error.meta.endLn + 1,
-        startColumn: error.meta.startCol + 1,
-        endColumn: error.meta.endCol + 1,
-        message: `ParseError: ${error.message}`,
-        severity: monaco.MarkerSeverity.Error,
-      }));
-
-      const [typechecked, typeErrors] = new Typechecker(parsed).typecheck();
-      if (!typechecked) {
-        for (const error of typeErrors.errors) {
-          markers.push({
-            startLineNumber: error.meta.startLn + 1,
-            endLineNumber: error.meta.endLn + 1,
-            startColumn: error.meta.startCol + 1,
-            endColumn: error.meta.endCol + 1,
-            message: `TypeError: ${error.message}`,
-            severity: monaco.MarkerSeverity.Error,
-          });
-        }
-      }
-
-      monaco.editor.setModelMarkers(editor.getModel()!, 'owner', markers);
-    },
-    [monaco],
-  );
+    monaco.editor.setModelMarkers(editor.getModel()!, 'owner', markers);
+  }, [monaco]);
 
   React.useEffect(() => {
     if (!monaco) {
@@ -132,7 +107,7 @@ export default function Editor() {
 
     const cleanup = editor.onDidChangeCursorPosition((e) => {
       setCursorPos([e.position.lineNumber, e.position.column]);
-      highlightErrors(language);
+      highlightErrors();
     });
     return () => {
       cleanup.dispose();
@@ -146,9 +121,17 @@ export default function Editor() {
       }
 
       const editor = monaco.editor.getEditors()[0];
+
+      monaco?.editor.setModelLanguage(editor?.getModel()!, lang.toLowerCase());
+      editor?.updateOptions({
+        autoIndent: lang === 'Nossembly' ? 'advanced' : 'none',
+        fontSize: lang === 'Nossembly' ? 16.0001 : 16, // horrible hack to force Monaco to update options immediately
+      });
+
       const program = getProgram(language, editor.getValue());
       editor.setValue(serializeProgram(lang, program));
       setLanguage(lang);
+      highlightErrors();
     },
     [monaco, language],
   );
@@ -200,17 +183,7 @@ export default function Editor() {
               key={lang}
               active={language === lang}
               onClick={() => {
-                const editor = monaco?.editor.getEditors()[0];
-                monaco?.editor.setModelLanguage(
-                  editor?.getModel()!,
-                  lang.toLowerCase(),
-                );
-                editor?.updateOptions({
-                  autoIndent: lang === 'Nossembly' ? 'advanced' : 'none',
-                  fontSize: lang === 'Nossembly' ? 16.0001 : 16, // horrible hack to force Monaco to update options immediately
-                });
                 changeLanguage(lang);
-                highlightErrors(lang);
               }}
             >
               {lang}

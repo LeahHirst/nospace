@@ -29,8 +29,8 @@ export function Chevron({ direction, width, height, color }: ChevronProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_51_3)">
-        <path d="M1 1L7 7L13 1" stroke={color ?? 'white'} stroke-width="2" />
+      <g clipPath="url(#clip0_51_3)">
+        <path d="M1 1L7 7L13 1" stroke={color ?? 'white'} strokeWidth="2" />
       </g>
       <defs>
         <clipPath id="clip0_51_3">
