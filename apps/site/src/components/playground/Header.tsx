@@ -2,6 +2,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 import Dropdown, { DropdownAction } from './Dropdown';
 import Button from './Button';
+import { usePlaygroundContext } from './PlaygroundContext';
 
 const Base = styled.nav`
   background-color: #2e2e2e;
@@ -31,6 +32,8 @@ const RightActions = styled.div`
 `;
 
 export default function Header() {
+  const { run } = usePlaygroundContext();
+
   return (
     <Base>
       <Flex>
@@ -41,7 +44,7 @@ export default function Header() {
         </Dropdown>
       </Flex>
       <RightActions>
-        <Button>Run</Button>
+        <Button onClick={run}>Run</Button>
         <Button>Share</Button>
       </RightActions>
     </Base>

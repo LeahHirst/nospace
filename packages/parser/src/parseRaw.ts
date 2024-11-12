@@ -41,7 +41,7 @@ function parseNumber(chars: string) {
 }
 
 // Generates an alpha token from a number (A-Z, AA-ZZ, etc.)
-function generateToken(n: number) {
+export function generateToken(n: number) {
   return n
     .toString(26)
     .split('')
@@ -95,7 +95,7 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
   let col = 0;
   for (const char of normalized) {
     buf += char;
-    if (char === 'n') {
+    if (char === 'n' && ignoreNospace) {
       ln++;
       col = 1;
     } else {
@@ -116,13 +116,9 @@ export function parseRaw(raw: string, ignoreNospace = false): IRArgs {
               )?.[0] ?? '',
           };
           if (isTypeInstruction(instruction)) {
-            const typeName =
-              Object.entries(types).find(([_k, v]) => v === buf)?.[0] ??
-              `Type${generateToken(Object.keys(types).length - Object.keys(Type).length)}`;
-            types[typeName] ??= buf;
             operations.push({
               instruction,
-              argument: typeName,
+              argument: buf,
               meta: {
                 ...meta,
                 typeName: ignoreNospace

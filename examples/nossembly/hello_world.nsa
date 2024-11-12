@@ -1,0 +1,37 @@
+Push 0
+Cast EndOfString
+Push 33
+Cast Char
+Push 100
+Cast Char
+Push 108
+Cast Char
+Push 114
+Cast Char
+Push 111
+Cast Char
+Push 119
+Cast Char
+Push 32
+Cast Char
+Push 111
+Cast Char
+Push 108
+Cast Char
+Push 108
+Cast Char
+Push 101
+Cast Char
+Push 72
+Cast Char
+
+Label A
+  Duplicate
+  Cast Int
+  JumpZero B
+  WriteChar
+  Jump A
+
+Label B
+  Assert EndOfString
+  Pop

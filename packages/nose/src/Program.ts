@@ -1,10 +1,6 @@
-import { NospaceIR } from '@repo/parser';
-import { Instruction, Operation } from '@repo/parser';
-import { parseNumber } from './utils';
+import { NospaceIR, Instruction, type Operation } from '@repo/parser';
 
 export class Program {
-  private ir: NospaceIR;
-
   private inputBuffer: string;
 
   public output: string = '';
@@ -16,11 +12,10 @@ export class Program {
   private labelIndices: { [label: string]: number } = {};
 
   constructor(
-    public code: string,
+    public ir: NospaceIR,
     public input: string,
   ) {
     this.inputBuffer = input;
-    this.ir = NospaceIR.fromNospace(code);
     for (let i = 0; i < this.ir.operations.length; i++) {
       const op = this.ir.operations[i];
       if (op.instruction === Instruction.Label && op.argument) {

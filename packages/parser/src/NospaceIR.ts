@@ -4,12 +4,13 @@ import {
   Operation,
   ParseError,
   TokenMap,
+  Type,
   isLabeledOperation,
   isNumericOperation,
   isTypeOperation,
 } from './interfaces';
 import { parseNossembly } from './parseNossembly';
-import { parseRaw } from './parseRaw';
+import { generateToken, parseRaw } from './parseRaw';
 import { irToNospace, irToWhitespace, serializeNumber } from './utils';
 
 export class NospaceIR {
@@ -30,6 +31,8 @@ export class NospaceIR {
       Object.entries(Instruction).map(([k, v]) => [v, k]),
     );
 
+    const types: Record<string, string> = structuredClone(Type);
+
     let indent = false;
     const lines = [];
 
@@ -42,13 +45,25 @@ export class NospaceIR {
           lines.push('');
         }
       }
-      const prefix = indent && op.instruction !== Instruction.Label ? '  ' : '';
-      lines.push(
-        [prefix, name, op.argument].filter((x) => x !== undefined).join(' '),
-      );
+      const prefix =
+        indent && op.instruction !== Instruction.Label ? ' ' : undefined;
+
+      const line: (string | number | undefined)[] = [prefix, name];
+
+      if (isTypeOperation(op)) {
+        const typeName =
+          Object.entries(types).find(([_k, v]) => v === op.argument)?.[0] ??
+          `Type${generateToken(Object.keys(types).length - Object.keys(Type).length)}`;
+        types[typeName] ??= op.argument;
+        line.push(typeName);
+      } else {
+        line.push(op.argument);
+      }
+
+      lines.push(line.filter((x) => x !== undefined).join(' '));
     }
 
-    return lines.join('\n');
+    return lines.join('\n') + '\n';
   }
 
   toWhitespace() {
