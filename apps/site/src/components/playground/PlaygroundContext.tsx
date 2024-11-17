@@ -40,7 +40,7 @@ const PlaygroundContext = createContext<PlaygroundContextType>({
   run: () => {},
   share: () => {},
   getTypegraphUrl: () => undefined,
-  strict: true,
+  strict: false,
   setStrict: () => {},
 });
 
@@ -55,7 +55,7 @@ export const PlaygroundContextProvider = ({
   const [programInput, setProgramInput] = useState(input);
   const [programOutput, setProgramOutput] = useState('');
   const [compilerOutput, setCompilerOutput] = useState<CompilerMessage[]>([]);
-  const [strict, setStrict] = useState(true);
+  const [strict, setStrict] = useState(false);
 
   const monaco = useMonaco();
 

@@ -30,14 +30,29 @@ export const DropdownAction = styled.button`
 export type DropdownProps = {
   label: string;
   children: React.ReactNode;
+  open?: boolean;
+  onTriggerClick?: () => void;
 };
 
-export default function Dropdown({ label, children }: DropdownProps) {
+export default function Dropdown({
+  label,
+  children,
+  open,
+  onTriggerClick,
+}: DropdownProps) {
   const [show, setShow] = useState(false);
 
   return (
     <div>
-      <Button onClick={() => setShow(!show)}>
+      <Button
+        onClick={() => {
+          if (open !== undefined) {
+            setShow(!show);
+          } else {
+            onTriggerClick?.();
+          }
+        }}
+      >
         {label}
         <Chevron direction={show ? 'up' : 'down'} />
       </Button>

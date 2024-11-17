@@ -61,11 +61,17 @@ export default function Header() {
     };
   }, [share]);
 
+  const [examplesOpen, setExamplesOpen] = useState(false);
+
   return (
     <Base>
       <Flex>
         <H1>Playground</H1>
-        <Dropdown label="Examples">
+        <Dropdown
+          open={examplesOpen}
+          onTriggerClick={() => setExamplesOpen((v) => !v)}
+          label="Examples"
+        >
           <DropdownAction>Hello world</DropdownAction>
           <DropdownAction>Hello types</DropdownAction>
         </Dropdown>
