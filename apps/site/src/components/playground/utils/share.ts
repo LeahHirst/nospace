@@ -1,4 +1,6 @@
+import { NospaceIR } from '@repo/parser';
 import lzstring from 'lz-string';
+import { serializeProgram } from './program';
 
 export function generateShareHashParameter(code: string, input?: string) {
   return `#code/${[code, input]
@@ -7,15 +9,18 @@ export function generateShareHashParameter(code: string, input?: string) {
     .join('/')}`;
 }
 
-export function getSharedCode() {
+export function getSharedCode(lang: string = 'nospace') {
   if (typeof window !== 'undefined' && location.hash.startsWith('#code')) {
-    const [code, input] = location.hash
+    const [nossembly, input] = location.hash
       .replace('#code/', '')
       .trim()
       .split('/')
       .map((x) => lzstring.decompressFromEncodedURIComponent(x));
+
+    const ir = NospaceIR.fromNossembly(nossembly);
+
     return {
-      code,
+      code: serializeProgram(lang, ir),
       input,
     };
   }

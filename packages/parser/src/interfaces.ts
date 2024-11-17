@@ -25,6 +25,7 @@ export enum Instruction {
   Retrieve = 'ttt',
   Cast = 'xs',
   Assert = 'xt',
+  Strict = 'xxx',
   UnknownInstruction = 'unknown',
 }
 
@@ -121,6 +122,7 @@ export type ParseError =
 export enum Type {
   Never = 'ttn',
   Any = 'tsn',
+  Unknown = 'tssn',
   Int = 'ssn',
   Char = 'stn',
 }

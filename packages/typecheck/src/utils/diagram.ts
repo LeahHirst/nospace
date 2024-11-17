@@ -7,10 +7,18 @@ function getLabel(node: EffectGraphNode<StackEffect>) {
     return 'Never';
   }
 
+  if (node.effect.effectType === 'pop') {
+    return 'pop';
+  }
+
   return `${node.effect.effectType} ${node.meta?.typeName ?? 'Any'}`;
 }
 
-export function diagram(rootNode: EffectGraphNode) {
+export function diagram(
+  rootNode: EffectGraphNode,
+  erroredNodes: EffectGraphNode[] = [],
+  warningNodes: EffectGraphNode[] = [],
+) {
   const connections: string[] = [];
   const nodeNames = new Map<EffectGraphNode, string>();
 
@@ -48,5 +56,16 @@ export function diagram(rootNode: EffectGraphNode) {
   drawConnections();
 
   return `graph TD
-  ${connections.join('\n  ')}`;
+  ${[
+    connections.length === 0 ? 'Never' : '',
+    ...connections,
+    erroredNodes.map(
+      (x) => `style ${nodeNames.get(x)} stroke:red,fill: #803e3e`,
+    ),
+    warningNodes.map(
+      (x) => `style ${nodeNames.get(x)} stroke:yellow,fill: #806f3e`,
+    ),
+  ]
+    .filter(Boolean)
+    .join('\n  ')}`;
 }

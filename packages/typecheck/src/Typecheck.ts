@@ -9,11 +9,13 @@ export class Typechecker {
 
   constructor(public ir: NospaceIR) {}
 
-  typecheck(): [boolean, { errors: TypeError[]; warnings: TypeWarning[] }] {
+  typecheck(
+    strictMode = false,
+  ): [boolean, { errors: TypeError[]; warnings: TypeWarning[] }] {
     const branches = extractBranches(this.ir.operations);
-    this.rootNode = buildEffectGraph(branches);
+    this.rootNode = buildEffectGraph(branches, strictMode);
 
-    const errors = resolveTypeGraph(this.rootNode);
+    const errors = resolveTypeGraph(this.rootNode, strictMode);
 
     return [errors.length === 0, { errors, warnings: [] }];
   }

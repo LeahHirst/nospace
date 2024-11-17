@@ -8,9 +8,12 @@ import {
   type ReactNode,
 } from 'react';
 import { getProgram } from './utils/program';
-import { Typechecker } from '@repo/typecheck/index';
+import { Typechecker, diagram } from '@repo/typecheck/index';
 import { Program } from '@repo/nose/index';
 import { generateShareHashParameter, getSharedCode } from './utils/share';
+import { deflate } from 'pako';
+import { fromUint8Array } from 'js-base64';
+import type { EffectGraphNode } from '../../../../../packages/typecheck/src/effectGraph';
 
 export type CompilerMessage = {
   message: string;
@@ -24,6 +27,9 @@ export type PlaygroundContextType = {
   compilerOutput: CompilerMessage[];
   run: () => void;
   share: () => void;
+  getTypegraphUrl: () => string | undefined;
+  strict: boolean;
+  setStrict: (v: boolean) => void;
 };
 
 const PlaygroundContext = createContext<PlaygroundContextType>({
@@ -33,6 +39,9 @@ const PlaygroundContext = createContext<PlaygroundContextType>({
   compilerOutput: [],
   run: () => {},
   share: () => {},
+  getTypegraphUrl: () => undefined,
+  strict: true,
+  setStrict: () => {},
 });
 
 export const usePlaygroundContext = () => useContext(PlaygroundContext);
@@ -46,6 +55,7 @@ export const PlaygroundContextProvider = ({
   const [programInput, setProgramInput] = useState(input);
   const [programOutput, setProgramOutput] = useState('');
   const [compilerOutput, setCompilerOutput] = useState<CompilerMessage[]>([]);
+  const [strict, setStrict] = useState(true);
 
   const monaco = useMonaco();
 
@@ -71,7 +81,7 @@ export const PlaygroundContextProvider = ({
 
     const typechecker = new Typechecker(ir);
     const [success, { errors: typeErrors, warnings: typeWarnings }] =
-      typechecker.typecheck();
+      typechecker.typecheck(strict);
 
     if (!success) {
       setCompilerOutput([
@@ -88,12 +98,16 @@ export const PlaygroundContextProvider = ({
       return;
     }
 
-    setCompilerOutput([{ type: 'success', message: 'Success' }]);
-
-    const program = new Program(ir, programInput);
-    const output = program.execute();
-    setProgramOutput(output);
-  }, [monaco]);
+    try {
+      const program = new Program(ir, programInput);
+      const output = program.execute();
+      setProgramOutput(output);
+      setCompilerOutput([{ type: 'success', message: 'Success' }]);
+    } catch (e: unknown) {
+      console.log(e);
+      setCompilerOutput([{ type: 'error', message: (e as Error).message }]);
+    }
+  }, [monaco, strict]);
 
   const share = useCallback(() => {
     if (!monaco) {
@@ -102,9 +116,56 @@ export const PlaygroundContextProvider = ({
 
     const editor = monaco.editor.getEditors()[0];
 
-    const hash = generateShareHashParameter(editor.getValue(), programInput);
+    const ir = getProgram(
+      editor.getModel()?.getLanguageId() ?? 'nospace',
+      editor.getValue(),
+    );
+
+    const hash = generateShareHashParameter(ir.toNossembly(), programInput);
     location.hash = hash;
+    navigator.clipboard.writeText(location.href);
   }, [monaco, programInput]);
+
+  const getTypegraphUrl = useCallback(() => {
+    if (!monaco) {
+      return;
+    }
+
+    const editor = monaco.editor.getEditors()[0];
+
+    const ir = getProgram(
+      editor.getModel()?.getLanguageId() ?? 'nospace',
+      editor.getValue(),
+    );
+
+    const typechecker = new Typechecker(ir);
+    const errors = typechecker.typecheck(strict);
+
+    if (!typechecker.rootNode) {
+      return;
+    }
+
+    const code = diagram(
+      typechecker.rootNode,
+      errors[1]?.errors.map((x) => x.node).filter(Boolean) as EffectGraphNode[],
+      errors[1]?.warnings
+        .map((x) => x.node)
+        .filter(Boolean) as EffectGraphNode[],
+    );
+    const json = {
+      code,
+      mermaid: { theme: 'dark' },
+      autoSync: true,
+      rough: false,
+      updateDiagram: true,
+      panZoom: true,
+    };
+
+    const encoded = new TextEncoder().encode(JSON.stringify(json));
+    const compressed = deflate(encoded, { level: 9 });
+    const url = `https://mermaid.live/view#pako:${fromUint8Array(compressed, true)}`;
+    return url;
+  }, [monaco, strict]);
 
   const value = useMemo(
     () => ({
@@ -114,8 +175,20 @@ export const PlaygroundContextProvider = ({
       compilerOutput,
       run,
       share,
+      getTypegraphUrl,
+      strict,
+      setStrict,
     }),
-    [programInput, programOutput, compilerOutput, run, share],
+    [
+      programInput,
+      programOutput,
+      compilerOutput,
+      run,
+      share,
+      getTypegraphUrl,
+      strict,
+      setStrict,
+    ],
   );
 
   return (

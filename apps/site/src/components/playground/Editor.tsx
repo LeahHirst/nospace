@@ -12,6 +12,7 @@ import type { editor } from 'monaco-editor';
 import { Typechecker } from '@repo/typecheck/index';
 import { getProgram, serializeProgram } from './utils/program';
 import { getSharedCode } from './utils/share';
+import { usePlaygroundContext } from './PlaygroundContext';
 
 const Container = styled.div`
   display: flex;
@@ -30,16 +31,33 @@ const Toolbar = styled.div`
   padding: 0 20px;
 `;
 
+const Footer = styled(Toolbar)`
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  padding: 4px 20px;
+`;
+
 const Flex = styled.div`
   display: flex;
 `;
 
-const DEFAULT_PROGRAM = `
-Label Test
-  Push 1
-  Push 2
-  Add
-  WriteInt
+const EditorContainer = styled.div`
+  position: relative;
+  flex: 1;
+`;
+
+const IFrame = styled.iframe`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 10000;
 `;
 
 export default function Editor() {
@@ -47,6 +65,8 @@ export default function Editor() {
   const [language, setLanguage] = useState('Nospace');
   const [[lnNumber, colNumber], setCursorPos] = useState([1, 1]);
   const { code } = useMemo(() => getSharedCode(), []);
+  const [typegraphShown, setTypegraphShown] = useState(false);
+  const { getTypegraphUrl, strict, setStrict } = usePlaygroundContext();
 
   useEffect(() => {
     if (!monaco) {
@@ -83,7 +103,7 @@ export default function Editor() {
       severity: monaco.MarkerSeverity.Error,
     }));
 
-    const [typechecked, typeErrors] = new Typechecker(parsed).typecheck();
+    const [typechecked, typeErrors] = new Typechecker(parsed).typecheck(strict);
     if (!typechecked) {
       for (const error of typeErrors.errors) {
         markers.push({
@@ -98,7 +118,7 @@ export default function Editor() {
     }
 
     monaco.editor.setModelMarkers(editor.getModel()!, 'owner', markers);
-  }, [monaco]);
+  }, [monaco, strict]);
 
   React.useEffect(() => {
     if (!monaco) {
@@ -122,6 +142,10 @@ export default function Editor() {
         return;
       }
 
+      if (typegraphShown) {
+        setTypegraphShown(false);
+      }
+
       const editor = monaco.editor.getEditors()[0];
 
       monaco?.editor.setModelLanguage(editor?.getModel()!, lang.toLowerCase());
@@ -135,7 +159,7 @@ export default function Editor() {
       setLanguage(lang);
       highlightErrors();
     },
-    [monaco, language],
+    [monaco, language, typegraphShown],
   );
 
   const insert = React.useCallback(
@@ -176,6 +200,10 @@ export default function Editor() {
     [],
   );
 
+  useEffect(() => {
+    highlightErrors();
+  }, [strict]);
+
   return (
     <Container>
       <Toolbar>
@@ -183,7 +211,7 @@ export default function Editor() {
           {['Nospace', 'Whitespace', 'Nossembly'].map((lang) => (
             <Button
               key={lang}
-              active={language === lang}
+              active={!typegraphShown && language === lang}
               onClick={() => {
                 changeLanguage(lang);
               }}
@@ -191,6 +219,14 @@ export default function Editor() {
               {lang}
             </Button>
           ))}
+          <Button
+            active={typegraphShown}
+            onClick={() => {
+              setTypegraphShown(true);
+            }}
+          >
+            Typegraph
+          </Button>
         </Flex>
         <Flex>
           <Dropdown label="Insert">
@@ -207,15 +243,28 @@ export default function Editor() {
           </Dropdown>
         </Flex>
       </Toolbar>
-      <MonacoEditor
-        defaultValue={code}
-        theme="vs-dark"
-        options={monacoOptions}
-      />
-      <Toolbar>
-        <div />
-        Ln {lnNumber}, Col {colNumber}
-      </Toolbar>
+      <EditorContainer>
+        <MonacoEditor
+          defaultValue={code}
+          theme="vs-dark"
+          options={monacoOptions}
+        />
+        {typegraphShown && <IFrame src={getTypegraphUrl()} />}
+        <Footer>
+          <Flex style={{ gap: '8px' }}>
+            <input
+              id="strict"
+              type="checkbox"
+              checked={strict}
+              onChange={(e) => {
+                setStrict(e.target.checked);
+              }}
+            />
+            <label htmlFor="strict">Strict mode</label>
+          </Flex>
+          Ln {lnNumber}, Col {colNumber}
+        </Footer>
+      </EditorContainer>
     </Container>
   );
 }
