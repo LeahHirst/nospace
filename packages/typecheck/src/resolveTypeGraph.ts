@@ -49,6 +49,7 @@ function resolves(
     if (
       parent.effect.type !== Type.Any &&
       node.effect.type !== Type.Any &&
+      node.effect.type !== Type.Unknown &&
       parent.effect.type !== node.effect.type
     ) {
       continue;
