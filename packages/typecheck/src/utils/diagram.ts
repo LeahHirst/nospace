@@ -7,11 +7,18 @@ function getLabel(node: EffectGraphNode<StackEffect>) {
     return 'Never';
   }
 
-  if (node.effect.effectType === 'pop') {
-    return 'pop';
-  }
+  // if (node.effect.effectType === 'pop') {
+  //   return 'pop';
+  // }
+  //
+  const typeName =
+    Object.entries(Type).find(
+      ([k, v]) => v === (node.effect as any).type,
+    )?.[0] ||
+    node.meta?.typeName ||
+    'Any';
 
-  return `${node.effect.effectType} ${node.meta?.typeName ?? 'Any'}`;
+  return `${node.effect.effectType} ${typeName}`;
 }
 
 export function diagram(
