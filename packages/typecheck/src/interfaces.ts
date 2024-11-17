@@ -1,8 +1,10 @@
 import type { Operation, CodeMeta } from '@repo/parser';
+import { EffectGraphNode } from './effectGraph';
 
 export enum Type {
   Never = 'ttn',
   Any = 'tsn',
+  Unknown = 'tssn',
   Int = 'ssn',
   Char = 'stn',
 }
@@ -56,6 +58,7 @@ export type StackEffectNode = {
 type Info = {
   message: string;
   meta: CodeMeta;
+  node: EffectGraphNode;
 };
 
 export type AssertionError = Info & {
@@ -70,7 +73,15 @@ export type UnderflowError = Info & {
   type: 'underflow';
 };
 
-export type TypeError = AssertionError | TypeMismatchError | UnderflowError;
+export type StrictModeViolationError = Info & {
+  type: 'strict_mode_violation';
+};
+
+export type TypeError =
+  | AssertionError
+  | TypeMismatchError
+  | UnderflowError
+  | StrictModeViolationError;
 
 export type UnreachableWarning = Info & {
   type: 'unreachable';

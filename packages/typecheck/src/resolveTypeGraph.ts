@@ -40,7 +40,8 @@ function resolves(
   for (const parent of node.parents) {
     if (
       parent.effect.effectType !== 'push' ||
-      parent.effect.type === Type.Never
+      parent.effect.type === Type.Never ||
+      (parent.effect.type === Type.Unknown && node.effect.type !== Type.Unknown)
     ) {
       continue;
     }
@@ -104,7 +105,7 @@ const EMPTY_META = {
   instructionName: '',
 };
 
-function buildTypeError(node: EffectGraphNode): TypeError {
+function buildTypeError(node: EffectGraphNode, strictMode = false): TypeError {
   const stackTypes = Array.from(
     new Set(
       Array.from(node.parents)
@@ -118,6 +119,7 @@ function buildTypeError(node: EffectGraphNode): TypeError {
       type: 'underflow',
       message: `Cannot perform ${node.meta?.instructionName.toLowerCase()} as this would result in a stack underflow.`,
       meta: node.meta ?? EMPTY_META,
+      node,
     };
   }
 
@@ -134,6 +136,25 @@ function buildTypeError(node: EffectGraphNode): TypeError {
       type: 'mismatch',
       message: `Attempted to assert type "${node.meta?.typeName}", but the top item of the stack is of type "${unionedTypes}".\n\n${origins}`,
       meta: node.meta ?? EMPTY_META,
+      node,
+    };
+  }
+
+  if (
+    strictMode &&
+    node.effect.effectType === 'pop' &&
+    Array.from(node.parents).some(
+      (parent) =>
+        parent.effect.effectType === 'push' &&
+        parent.effect.type === Type.Unknown,
+    )
+  ) {
+    return {
+      type: 'strict_mode_violation',
+      message:
+        'When using strict mode, all types pushed to the stack must be cast prior to use',
+      meta: node.meta ?? EMPTY_META,
+      node,
     };
   }
 
@@ -141,11 +162,13 @@ function buildTypeError(node: EffectGraphNode): TypeError {
     type: 'mismatch',
     message: `Cannot perform ${node.meta?.instructionName.toLowerCase()} as the top item on the stack is of type "${unionedTypes}".\n\n${origins}`,
     meta: node.meta ?? EMPTY_META,
+    node,
   };
 }
 
 export function resolveTypeGraph(
   rootNode: EffectGraphNode<StackEffect>,
+  strictMode = false,
 ): TypeError[] {
   const nodesToResolve = findNodesToResolve(rootNode);
 
@@ -158,7 +181,17 @@ export function resolveTypeGraph(
       }
     }
     if (!progressed) {
-      return Array.from(nodesToResolve).map(buildTypeError);
+      return Array.from(nodesToResolve)
+        .filter(
+          (node) =>
+            !(
+              node.effect.effectType === 'pop' &&
+              Array.from(node.parents).every(
+                (parent) => parent.effect.effectType === 'pop',
+              )
+            ),
+        )
+        .map((node) => buildTypeError(node, strictMode));
     }
   }
 

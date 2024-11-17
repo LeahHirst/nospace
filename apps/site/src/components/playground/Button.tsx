@@ -2,7 +2,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 
 /**
- * 
+ *
     display: flex;
     gap: 8px;
     border-top: solid 2px transparent;
@@ -25,6 +25,8 @@ const Base = styled.button<{
   font-weight: 500;
   font-size: 1rem;
   align-items: center;
+
+  text-wrap-mode: nowrap;
   color: ${({ active }) => (active ? '#d096ff' : 'white')};
   background-color: transparent;
   ${({ active }) => (active ? 'border-bottom: solid 2px #d096ff;' : '')}

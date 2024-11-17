@@ -18,7 +18,7 @@ type NodeFragment = {
   tail?: EffectGraphNode;
 };
 
-export function buildEffectGraph(branches: Branch[]) {
+export function buildEffectGraph(branches: Branch[], strictMode = false) {
   const branchPointers = new Map<Branch, NodeFragment>();
   const baseNode: EffectGraphNode = {
     effect: {
@@ -53,7 +53,7 @@ export function buildEffectGraph(branches: Branch[]) {
 
   for (const branch of branches) {
     const operationEffects = branch.operations.map<[Operation, StackEffect[]]>(
-      (op) => [op, produceStackEffects(op)],
+      (op) => [op, produceStackEffects(op, strictMode)],
     );
     const nodes: EffectGraphNode[] = [];
     for (const [op, effects] of operationEffects) {

@@ -29,18 +29,13 @@ export class Program {
     this.inputBuffer = this.input;
     this.stack = [];
     this.heap = [];
-    try {
-      this.run();
-    } catch (e) {
-      console.error(e);
-    }
+    this.run();
     return this.output;
   }
 
   private run(fromLabel?: string) {
     let instr = fromLabel ? this.labelIndices[fromLabel] : 0;
 
-    let i = 0;
     let op: Operation;
     while ((op = this.ir.operations[instr])) {
       if ([Instruction.Return, Instruction.End].includes(op.instruction)) {
@@ -51,12 +46,20 @@ export class Program {
     }
   }
 
+  private pop() {
+    const val = this.stack.pop();
+    if (val === undefined) {
+      throw new Error('Stack underflow');
+    }
+    return val;
+  }
+
   private processOperation(operation: Operation): void | number {
     switch (operation.instruction) {
       case Instruction.ReadChar: {
         const char = this.inputBuffer[0]?.charCodeAt(0) ?? 0;
         this.inputBuffer = this.inputBuffer.slice(1);
-        const addr = this.stack.pop();
+        const addr = this.pop();
         if (!addr) {
           return;
         }
@@ -69,7 +72,7 @@ export class Program {
             ? 0
             : this.inputBuffer[0].charCodeAt(0);
         this.inputBuffer = this.inputBuffer.slice(1);
-        const addr = this.stack.pop();
+        const addr = this.pop();
         if (!addr) {
           return;
         }
@@ -77,11 +80,11 @@ export class Program {
         return;
       }
       case Instruction.WriteChar: {
-        this.output += String.fromCharCode(this.stack.pop()!);
+        this.output += String.fromCharCode(this.pop());
         return;
       }
       case Instruction.WriteInt: {
-        this.output += this.stack.pop();
+        this.output += this.pop();
         return;
       }
       case Instruction.Push: {
@@ -93,11 +96,11 @@ export class Program {
         return;
       }
       case Instruction.Swap: {
-        this.stack.splice(this.stack.length - 2, 0, this.stack.pop()!);
+        this.stack.splice(this.stack.length - 2, 0, this.pop());
         return;
       }
       case Instruction.Pop: {
-        this.stack.pop();
+        this.pop();
         return;
       }
       case Instruction.Copy: {
@@ -110,32 +113,32 @@ export class Program {
         return;
       }
       case Instruction.Add: {
-        const a = this.stack.pop()!;
-        const b = this.stack.pop()!;
+        const a = this.pop();
+        const b = this.pop();
         this.stack.push(a + b);
         return;
       }
       case Instruction.Subtract: {
-        const a = this.stack.pop()!;
-        const b = this.stack.pop()!;
+        const a = this.pop();
+        const b = this.pop();
         this.stack.push(b - a);
         return;
       }
       case Instruction.Multiply: {
-        const a = this.stack.pop()!;
-        const b = this.stack.pop()!;
+        const a = this.pop();
+        const b = this.pop();
         this.stack.push(a * b);
         return;
       }
       case Instruction.Divide: {
-        const a = this.stack.pop()!;
-        const b = this.stack.pop()!;
+        const a = this.pop();
+        const b = this.pop();
         this.stack.push(b / a);
         return;
       }
       case Instruction.Mod: {
-        const a = this.stack.pop()!;
-        const b = this.stack.pop()!;
+        const a = this.pop();
+        const b = this.pop();
         this.stack.push(b % a);
       }
       case Instruction.Call: {
@@ -146,25 +149,25 @@ export class Program {
         return this.labelIndices[operation.argument!];
       }
       case Instruction.JumpZero: {
-        if (this.stack.pop() === 0) {
+        if (this.pop() === 0) {
           return this.labelIndices[operation.argument!];
         }
         return;
       }
       case Instruction.JumpNegative: {
-        if (this.stack.pop()! < 0) {
+        if (this.pop() < 0) {
           return this.labelIndices[operation.argument!];
         }
         return;
       }
       case Instruction.Store: {
-        const val = this.stack.pop();
-        const addr = this.stack.pop();
+        const val = this.pop();
+        const addr = this.pop();
         this.heap[addr!] = val!;
         return;
       }
       case Instruction.Retrieve: {
-        const addr = this.stack.pop();
+        const addr = this.pop();
         this.stack.push(this.heap[addr!]);
         return;
       }

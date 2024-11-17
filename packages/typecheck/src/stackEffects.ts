@@ -1,7 +1,11 @@
 import { Instruction, type Operation } from '@repo/parser';
 import { type StackEffect, Type } from './interfaces';
 
-export function produceStackEffects(operation: Operation): StackEffect[] {
+export function produceStackEffects(
+  operation: Operation,
+  strictMode = false,
+): StackEffect[] {
+  const unknownType = strictMode ? Type.Unknown : Type.Any;
   switch (operation.instruction) {
     case Instruction.ReadChar:
     case Instruction.ReadInt: {
@@ -32,7 +36,7 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
       return [
         {
           effectType: 'push',
-          type: Type.Any,
+          type: unknownType,
         },
       ];
     }
@@ -45,7 +49,7 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
         // },
         {
           effectType: 'push',
-          type: Type.Any,
+          type: unknownType,
         },
       ];
     }
@@ -160,7 +164,7 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
         },
         {
           effectType: 'push',
-          type: Type.Any,
+          type: unknownType,
         },
       ];
     }
@@ -168,7 +172,7 @@ export function produceStackEffects(operation: Operation): StackEffect[] {
       return [
         {
           effectType: 'pop',
-          type: Type.Any,
+          type: unknownType,
         },
         {
           effectType: 'push',

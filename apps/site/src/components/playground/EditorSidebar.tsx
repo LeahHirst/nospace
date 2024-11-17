@@ -15,7 +15,7 @@ const SidebarContainer = styled.div`
 
 const CodeBox = styled.code`
   padding: 8px;
-  min-height: 16px;
+  min-height: fit-content;
   background-color: #1e1e1e;
   flex: 0;
 `;
