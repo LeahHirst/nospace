@@ -1,0 +1,148 @@
+---
+title: Nospace for WS Programmers
+description: Learn more about my project in this docs site built with Starlight
+sidebar:
+  order: 1
+---
+import Example from '../../../components/Example.tsx';
+
+Nospace stands in an unusual relationship to Whitespace. Nospace offers all of Whitespace's features, and an additional layer on top of these: Nospace's type system.
+
+For example, Whitespace provides language primitives like `Char` and `Int`, but it doesn’t check that you're using them appropriately. Nospace does.
+
+This means that your existing working Whitespace code is also Nospace code. The main benefit of Nospace is that it can highlight unexpected behavior in your code, lowering the chance of bugs.
+
+This tutorial provides a brief overview of Nospace, focusing on its syntax and type system.
+
+## Syntax
+
+Nospace extends the syntax of Whitespace, adding aliasing of Whitespace characters with zero-width unicode characters:
+
+- Space is aliased with zero-width space (ZWSP; `U+200B`; `​`)
+- Tab is aliased with zero-width non-joiner (ZWNJ; `U+200C`; `‌`)
+- Newline is aliased with zero-width joiner (ZWJ; `U+200D`; `‍`)
+
+In addition, a fourth character—the word joiner (WJ; `U+2060`; `⁠`)—is added to the syntax which is used to namespace Nospace-specific type commands.
+
+## Type System
+
+### Types by Inference
+
+Nospace knows the Whitespace language and will generate types for you in many cases. For example if you make use of Whitespace's arithmetic operations, Nospace knows that the resulting type is an `Int`.
+
+By understanding how Whitespace works, Nospace can build a type-system that accepts Whitespace code but has types. This offers a type-system without needing to add extra characters to make types explicit in your code.
+
+### Defining Types
+
+You can use a wide variety of design patterns in Whitespace. However, some design patterns make it difficult for types to be inferred automatically. To cover these cases, Nospace supports an extension of the Whitespace language, which offers places for you to tell Nospace what the types should be.
+
+Nospace lets you alter the type of the top item on the stack using the `Cast` command:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
+Cast MyType`}/>
+
+Types can either be user defined, or one of the following primatives:
+
+- `Never` (`ZWNJ`, `ZWNJ`, `ZWJ`)
+- `Any` (`ZWNJ`, `ZWSP`, `ZWJ`)
+- `Unknown` (`ZWNJ`, `ZWSP`, `ZWSP`, `ZWJ`)
+- `Int` (`ZWSP`, `ZWSP`, `ZWJ`)
+- `Char` (`ZWSP`, `ZWNJ`, `ZWJ`)
+
+Custom types are defined as a sequence of zero-width spaces and zero-width non-joiners terminated by a zero-width joiner.
+
+Some primative types come with special behaviors:
+
+- The `Never` type represents the empty state of the stack. Casting onto a `Never` type or otherwise attempting to remove a `Never` type from the stack is not permitted is not permitted.
+- The `Any` type is the most permissive type in that comparisons between `Any` and any other type will always succeed.
+- The `Unknown` type cannot be removed from the stack prior to it being cast to a known type.
+
+### Type Assertions
+
+In addition to casting types on the stack, Nospace allows you to assert that the top item of the stack matches a given type using the `Assert` command. If you attempt to assert a type which mismatches the top item, you will receive a compile-time error:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
+Cast MyTypeA
+Assert MyTypeB`} error={`TypeError: Attempted to assert type "MyTypeB", but the top item of the stack is of type "MyTypeA".`}/>
+
+We'll go on to see how type assertions like this help to provide additional type safety for programs with more complicated control flow later in this guide.
+
+### Recursive Types
+
+Often during runtime programs end up with an indeterminate number of items of a certain type being present on the stack. Consider the following example which accepts an `Int` from the program input, and adds `N` items to the stack based on that input:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
+Cast TypeA
+
+Push 1
+ReadInt
+
+Label Loop
+\tPush 1
+\tRetrieve
+\tDuplicate
+\tJumpZero Finish
+\tCast TypeB
+\tDuplicate
+\tPush 1
+\tSubtract
+\tPush 1
+\tSwap
+\tStore
+\tJump Loop
+
+Label Finish
+\tEnd`}/>
+
+By the time the program end, we'll have `N` items of that are `TypeB` and one item of `TypeA` at the bottom of the stack. The top item of the stack is therefor the union of `TypeA` and `TypeB` (henceforth notated as `TypeA | TypeB`).
+
+In Nospace this union is not represented directly, but rather once the type is known, Nospace can re-resolve the state of the stack to ensure type consistency within the rest of the program. Pushing additional items onto the stack does not expand that union value either - the additional item will retain it's own value until popped from the stack.
+
+A common pattern for handling indeterminate lengths is to use a sentinel values to represent the end of a sequence. By typing this sentinel value, you can let Nospace know that you've finished processing that sequence of values in order to remove the type of those values from the stack:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
+Cast Sentinel
+
+Label Loop
+\tPush 1
+\tCast CustomType
+\tPush 1 # mocked user input, could be 0 or 1
+\tJumpZero Loop
+
+Assert CustomType
+Pop
+Assert CustomType
+Pop
+Assert Sentinel
+# Assertions against CustomType will now fail`}/>
+
+
+### Composite Types
+
+// todo
+
+## Stack Typing
+
+In Nospace, all items on the stack have an associated type. The default type added to the stack is either `Any` or `Undefined`, depending on whether strict mode is enabled. In strict mode, all items on the stack must first be cast to a determinate type before use.
+
+When type checking, Nospace uses these values to determine whether an operation is permissable.
+
+## Heap Typing
+
+Nospace does not currently type any values on the heap. This limitation is due to Whitespace's ability to allow arbitrary writes to the heap (for example based on a user's input at runtime). In practice this means that when reading off of the heap, developers should take care to cast the value back to a known type to ensure consistency.
+
+## Stack Underflows
+
+In addition to types, Nospace is also able to detect certain situations in which stack underflows will occur. For example, performing `Pop` on an empty stack will result in a compile-time error:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Pop`} error="TypeError: Cannot perform pop as this would result in a stack underflow." />
+
+There are examples which Nospace will not warn about which may seem surprising at first, for example consider this program which recursively `Pop`s items off the stack:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
+
+Label Loop
+\tPop
+\tJump Loop`} />
+
+While it's trivial to see that this program will error at runtime, Nospace happily compiles this program as it only provides a guarentee that there is no state of the program for which any instruction will fail. Since the first time the loop is executed the `Pop` will succeed, Nospace does not infer that subsequent calls into `Loop` will underflow the stack.

@@ -14,7 +14,7 @@ Nospace is an [esoteric programming language](https://en.wikipedia.org/wiki/Esot
 
 In addition to types, Nospace provides lexical aliasing of spaces with zero-width spaces (`​`), tabs with zero-width non-joiners (`‌`), and feed lines with zero-width joiners (`‍`). These changes allow for the creation of zero-width, single lined programs for worsened readability.
 
-Try out Nospace in your browser at [the playground](https://nospacelang.org/play)!
+View the [getting started guide](https://nospacelang.org/getting-started/intro-for-new-programmers/), or try Nospace out in your browser at [the playground](https://nospacelang.org/play)!
 
 ## Hello world
 

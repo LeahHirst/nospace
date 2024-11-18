@@ -107,7 +107,7 @@ export const PlaygroundContextProvider = ({
       console.log(e);
       setCompilerOutput([{ type: 'error', message: (e as Error).message }]);
     }
-  }, [monaco, strict]);
+  }, [monaco, strict, programInput]);
 
   const share = useCallback(() => {
     if (!monaco) {

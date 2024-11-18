@@ -1,0 +1,65 @@
+/* Dark mode colors. */
+:root {
+  --sl-color-bg-nav: #8331c6;
+  --sl-color-accent-low: #131e4f;
+  --sl-color-accent: #d8b3ff;
+  --sl-color-accent-high: #d8b3ff;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #eceef2;
+  --sl-color-gray-2: #c0c2c7;
+  --sl-color-gray-3: #888b96;
+  --sl-color-gray-4: #545861;
+  --sl-color-gray-5: #b38ad5;
+  --sl-color-gray-6: #24272f;
+  --sl-color-black: #262626;
+  --sl-color-bg-sidebar: #2a2a2b;
+  --sl-color-text: #fff;
+  --sl-color-bg-inline-code: #452e58;
+
+  --ns-examples-bg: #151515;
+  --ns-examples-fg: #fff;
+  --ns-examples-accent: #d096ff;
+  --ns-examples-toolbar-bg: #202020;
+  --ns-examples-error-bg: rgba(191, 24, 24, 0.1);
+  --ns-examples-error-border: #bf1818;
+
+}
+:root nav {
+  --sl-color-bg-nav: #531c79;
+}
+:root blockquote {
+  color: #cacaca;
+}
+
+/* Light mode colors. */
+:root[data-theme='light'] {
+  --sl-color-bg-nav: #8331c6;
+  --sl-color-accent-low: #c7d6ff;
+  --sl-color-accent: #a36ddd;
+  --sl-color-accent-high: #a36ddd;
+  --sl-color-white: #17181c;
+  --sl-color-gray-1: #fbfbfb;
+  --sl-color-gray-2: #353841;
+  --sl-color-gray-3: #545861;
+  --sl-color-gray-4: #888b96;
+  --sl-color-gray-5: #c0c2c7;
+  --sl-color-gray-6: #eceef2;
+  --sl-color-gray-7: #f5f6f8;
+  --sl-color-black: #faf9f8;
+  --sl-color-bg-sidebar: #eee;
+  --sl-color-bg: #faf9f8;
+  --sl-color-text: #000;
+
+  --ns-examples-bg: #eae3eb;
+  --ns-examples-fg: #000;
+  --ns-examples-accent: #9547d4;
+  --ns-examples-toolbar-bg: #f4f0f5;
+}
+
+:root[data-theme='light'] nav {
+  --sl-color-bg-nav: #eee;
+}
+
+:root[data-theme='light'] blockquote {
+  color: #242424;
+}

@@ -63,7 +63,7 @@ export class NospaceIR {
       lines.push(line.filter((x) => x !== undefined).join(' '));
     }
 
-    return lines.join('\n') + '\n';
+    return lines.join('\n');
   }
 
   toWhitespace() {
