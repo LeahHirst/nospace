@@ -67,16 +67,13 @@ export class Program {
         return;
       }
       case Instruction.ReadInt: {
-        const char =
-          this.inputBuffer[0] === undefined
-            ? 0
-            : this.inputBuffer[0].charCodeAt(0);
+        const num = Number(this.inputBuffer[0]);
         this.inputBuffer = this.inputBuffer.slice(1);
         const addr = this.pop();
         if (!addr) {
           return;
         }
-        this.heap[addr] = char;
+        this.heap[addr] = num;
         return;
       }
       case Instruction.WriteChar: {

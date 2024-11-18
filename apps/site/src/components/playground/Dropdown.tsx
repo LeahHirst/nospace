@@ -46,7 +46,7 @@ export default function Dropdown({
     <div>
       <Button
         onClick={() => {
-          if (open !== undefined) {
+          if (open === undefined) {
             setShow(!show);
           } else {
             onTriggerClick?.();

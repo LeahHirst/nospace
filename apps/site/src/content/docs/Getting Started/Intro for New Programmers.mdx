@@ -1,0 +1,127 @@
+---
+title: Nospace for the New Programmer
+description: Learn more about my project in this docs site built with Starlight
+sidebar:
+  order: 0
+---
+import Example from '../../../components/Example.tsx';
+
+Congratulations on choosing Nospace as one of your first languages — you’re already making good decisions!
+
+You’ve probably already heard that Nospace is a “flavor” or “variant” of Whitespace, just as <a href="https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html" target="_blank">TypeScript is a flavor of JavaScript</a>. The relationship between Nospace (NS) and Whitespace (WS) is rather unique among modern programming languages, so learning more about this relationship will help you understand how Nospace adds to Whitespace.
+
+## What is Whitespace? A Brief History
+
+Whitespace is an essoteric programming language designed in 2003 by <a href="https://www.type-driven.org.uk/edwinb/" target="_blank">Edwin Brady</a> and Chris Morris. It was created in response to the modern landscape of programming languages choosing to ignore whitespace characters as syntax:
+
+> "Most modern programming languages do not consider white space characters (spaces, tabs and newlines) syntax, ignoring them, as if they weren't there. We consider this to be a gross injustice to these perfectly friendly members of the character set. Should they be ignored, just because they are invisible? Whitespace is a language that seeks to redress the balance. Any non whitespace characters are ignored; only spaces, tabs and newlines are considered syntax."
+> _<a href="https://web.archive.org/web/20150523181043/http://compsoc.dur.ac.uk/whitespace/index.php" target="_blank">Durham University Computing Society: Whitespace</a>, published April 1st 2003_
+
+The following advantages of Whitespace were proposed upon it's introduction:
+
+> "Some things which are difficult in other languages are made much easier in Whitespace. For example, literate programming is simply a matter of writing your helpful comments in between program instructions. It's also easy to encrypt your programs. Simply write a misleading comment!
+>
+> "Whitespace is a particularly useful language for spies. Imagine you have a top secret program that you don't want anyone to see. What do you do? Simply print it out and delete the file, ready to type in at a later date. Nobody will know that your blank piece of paper is actually vital computer code!"
+
+Nospace builds upon this 20 year legacy by providing additional tooling to help write bug free Whitespace programs, and by aliasing Whitespace's syntax with zero-width unicode characters, helping the modern day spy (<a href="https://www.schneier.com/blog/archives/2024/11/subverting-llm-coders.html" target="_blank">_or sneaky LLM_</a>) ship production-ready, entirely unreadble code. Just as Whitespace gave whitespace characters the attention they deserved, Nospace elevates our often-overlooked zero-width chums to their rightful place as essential members of syntax.
+
+## Nospace: A Static Type Checker
+
+Detecting errors in code without running it is referred to as _static checking_. Determining what’s an error and what’s not based on the kinds of values being operated on is known as _static type_ checking.
+
+Nospace checks a program for errors before execution, and does so based on the _kinds of values_, making it a _static type checker_.
+
+Consider this classic Whitespace example:
+
+<Example languages={["Whitespace"]} example={`Push 1
+Duplicate
+ReadChar
+Retrieve
+Push 1
+Add`} />
+
+Now, check out the same code written in Nospace with type annotations:
+
+<Example languages={["Nospace"]} example={`Push 1
+Duplicate
+ReadChar
+Retrieve
+Cast Char
+Push 1
+Cast Char
+Add`} error={`TypeError: Cannot perform add as the top item on the stack is of type "Char".`} />
+
+You'll note that not only is the Nospace version practically self-documenting, but Nospace was also able to identify that the program was erroneously attempting to add two characters together.
+
+### A Typed Superset of Whitespace
+
+How does Nospace relate to Whitespace, though?
+
+#### Syntax
+
+Nospace is a language that is a _superset_ of Whitespace (_so long as your WS code contains no zero-width characters_): Whitespace syntax is therefore legal Nospace. Syntax refers to the way we write "text" to form a program. For example, this code has a _syntax_ error because it’s missing a newline:
+
+<Example languages={["Whitespace"]} example={``} raw="   	" error={`ParseError: Unrecognized instruction " 	"`} />
+
+Nospace doesn’t consider any Whitespace code to be an error because of its syntax. This means you can take any working Whitespace code and put it in a Nospace file without worrying about exactly how it is written.
+
+#### Types
+
+However, Nospace is a _typed_ superset, meaning that it adds rules about how different kinds of values can be used. The earlier error about being unable to add `Char`s together was not a _syntax error_: it is an error of using some kind of value (_a type_) in an incorrect way.
+
+As another example, this is Whitespace code that you can run in your browser, and it _will_ output a value so long as you provide a character as an input:
+
+<Example languages={["Whitespace"]} example={`Push 1
+ReadChar
+Push 1
+Retrieve
+WriteInt`} />
+
+This syntactically-legal program logs the integer value of the character passed in. Nospace, though, considers outputting a character as an integer to be a nonsensical operation without an explicit cast, and will issue an error:
+
+<Example languages={["Nospace"]} example={`Push 1
+ReadChar
+Push 1
+Retrieve
+Cast Char
+WriteInt`} error={`TypeError: Cannot perform WriteInt as the top item on the stack is of type "Char"`} />
+
+It’s possible you really _did_ intend to output the integer value of the character without a cast, perhaps just to see what happens, but most of the time, though, this is a programming mistake. Nospace's type checker is designed to allow correct programs through while still catching as many common errors as possible.
+
+If you move some code from a Whitespace file to a Nospace file, you might see type errors depending on how the code is written. These may be legitimate problems with the code, or Nospace being overly conservative. Throughout this guide we’ll demonstrate how to add various Nospace syntax to eliminate such errors.
+
+#### Runtime Behavior
+
+Nospace is also a programming language that preserves the runtime behavior of Whitespace. As a principle, Nospace never changes the runtime behavior of Whitespace code.
+
+This means that if you move code from Whitespace to Nospace, it is guaranteed to run the same way, even if Nospace thinks that the code has type errors.
+
+Keeping the same runtime behavior as Whitespace is a foundational promise of Nospace because it means you can easily transition between the two languages without worrying about subtle differences that might make your program stop working.
+
+#### Erased Types
+
+Roughly speaking, once Nospace's compiler is done with checking your code, it _erases_ the types to produce the resulting “compiled” code. This means that once your code is compiled, the resulting plain Whitespace code has no type information.
+
+This also means that Nospace never changes the _behavior_ of your program based on the types it inferred. The bottom line is that while you might see type errors during compilation, the type system itself has no bearing on how your program works when it runs.
+
+Finally, Nospace doesn’t provide any additional runtime libraries. Your programs will use the same standard library (or external libraries) as Whitespace programs, so there’s no additional Nospace-specific framework to learn.
+
+## Learning Whitespace and Nospace
+
+We frequently see the question "Should I learn Whitespace or Nospace?", almost as often as we see the question "why have you spent your limited precious time on this mortal coil creating an invisible programming language?".
+
+The answer the the former is that you can't learn Nospace without learning Whitespace! Nospace shares syntax and runtime behavior with Whitespace, so anything you learn about Whitespace is helping you learn Nospace at the same time.
+
+There are resources available for programmers to learn Whitespace; you should _not_ ignore these resources if you’re writing Nospace. For example, there are roughly infinitely more StackOverflow questions tagged `whitespace` than `nospace`, but _all_ of the `whitespace` questions also apply to Nospace.
+
+If you find yourself searching for something like “how to swap items on the stack in Nospace”, remember: **Nospace is Whitespace's runtime with a compile-time type checker**. The way you swap stack items in Nospace is the same way you do so in Whitespace. If you find a resource that uses Nospace directly, that’s great too, but don’t limit yourself to thinking you need Nospace-specific answers for everyday questions about how to accomplish runtime tasks.
+
+## Next steps
+
+This was a brief overview of the syntax and tools used in everyday Nospace. From here, you can:
+
+- Study <a href="https://esolangs.org/wiki/Whitespace" target="_blank">the Whitespace documentation</a> (or guess—it's just spaces, tabs, and newlines after all)
+- Continue to [Nospace for Whitespace Programmers](/getting-started/intro-for-whitespace-programmers)
+- Read the full Handbook [from start to finish](/handbook/the-nospace-handbook)
+- Explore [the Nospace Playground](/play)
+
