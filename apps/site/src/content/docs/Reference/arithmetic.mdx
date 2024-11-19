@@ -1,0 +1,138 @@
+---
+title: Arithmetic
+---
+import Example from '../../../components/Example.tsx';
+import SyntaxTable from '../../../components/SyntaxTable.tsx';
+
+All artithmetic commands use the `‌​` prefix and operate on two items in the stack. The second from top (first pushed) item is considered to be to the left of the operator, and top item (last pushed) is to the right of the operator.
+
+## Integer Literals
+
+Integers are expressed in Nospace as a binary squence of `​` and `‌`s (representing `0` and `1` respectively)
+prefixed by a `​` or `‌` indicating signedness (`+` and `-` respectievly) and terminated by a `‍`. For example, the number `518929412845` is represented as `​‌‌‌‌​​​‌‌​‌​​‌​‌​​‌‌​‌​​‌‌‌​​‌​‌‌‌​‌‌​‌‍`.
+
+## Addition
+
+The addition command takes two numbers from the top of the stack, adds them together, and pushes the result back to the stack.
+
+### Syntax
+
+<SyntaxTable command="Add" />
+
+### Parameters
+
+The addition command takes no parameters
+
+### Stack parameters
+
+The following parameters should be pushed in the order expressed below:
+
+- `Int` representing the left hand side of the operator
+- `Int` representing the right hand side of the operator
+
+### Example
+
+<Example client:load="react" example={`Push 1
+Push 2
+Add`}/>
+
+## Subtraction
+
+The subtract command takes two numbers from the top of the stack, subtracts the one pushed last, and pushes the result back to the stack.
+
+### Syntax
+
+<SyntaxTable command="Subtract" />
+
+
+### Parameters
+
+The subtract command takes no parameters
+
+### Stack parameters
+
+The following parameters should be pushed in the order expressed below:
+
+- `Int` representing the left hand side of the operator
+- `Int` representing the right hand side of the operator
+
+### Example
+
+<Example client:load="react" example={`Push 2
+Push 1
+Subtract`}/>
+
+## Multiplication
+
+The multiplication command takes two numbers from the top of the stack, multiplies them, and pushes the result back to the stack.
+
+### Syntax
+
+<SyntaxTable command="Multiply" />
+
+### Parameters
+
+The multiplication command takes no parameters
+
+### Stack parameters
+
+The following parameters should be pushed in the order expressed below:
+
+- `Int` representing the left hand side of the operator
+- `Int` representing the right hand side of the operator
+
+### Example
+
+<Example client:load="react" example={`Push 5
+Push 6
+Multiply`}/>
+
+## Integer Division
+
+The integer division command takes two numbers from the top of the stack, divides the item pushed last from the one pushed first, and pushes the result back to the stack.
+
+### Syntax
+
+<SyntaxTable command="Divide" />
+
+### Parameters
+
+The integer division command takes no parameters
+
+### Stack parameters
+
+The following parameters should be pushed in the order expressed below:
+
+- `Int` representing the left hand side of the operator
+- `Int` representing the right hand side of the operator
+
+### Example
+
+<Example client:load="react" example={`Push 15
+Push 3
+Divide`}/>
+
+## Modulo
+
+The modulo command takes two numbers from the top of the stack, multiplies them, and pushes the result back to the stack.
+
+### Syntax
+
+<SyntaxTable command="Mod" />
+
+### Parameters
+
+The modulo command takes no parameters
+
+### Stack parameters
+
+The following parameters should be pushed in the order expressed below:
+
+- `Int` representing the left hand side of the operator
+- `Int` representing the right hand side of the operator
+
+### Example
+
+<Example client:load="react" example={`Push 5
+Push 7
+Mod`}/>

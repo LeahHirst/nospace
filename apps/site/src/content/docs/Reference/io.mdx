@@ -1,0 +1,93 @@
+---
+title: I/O
+---
+import Example from '../../../components/Example.tsx';
+import SyntaxTable from '../../../components/SyntaxTable.tsx';
+
+## ReadChar
+
+The `ReadChar` command reads a character from the input and writes it to a provided heap address.
+
+### Syntax
+
+<SyntaxTable command="ReadChar" />
+
+### Parameters
+
+The `ReadChar` command takes no parameters
+
+### Stack parameters
+
+- `Int` - the heap address to write the character to.
+
+### Example
+
+<Example client:load="react" example={`Push 5
+ReadChar`}/>
+
+## ReadInt
+
+The `ReadInt` command reads an integer from the input and writes it to a provided heap address.
+
+### Syntax
+
+<SyntaxTable command="ReadInt" />
+
+### Parameters
+
+The `ReadInt` command takes no parameters
+
+### Stack parameters
+
+- `Int` - the heap address to write the integer to.
+
+### Example
+
+<Example client:load="react" example={`Push 5
+ReadInt`}/>
+
+## WriteChar
+
+The `WriteChar` command writes the `Char` at the top of the stack to the program output.
+
+### Syntax
+
+<SyntaxTable command="WriteChar" />
+
+### Parameters
+
+The `WriteChar` command takes no parameters
+
+### Stack parameters
+
+- `Char` - the character to output.
+
+### Example
+
+<Example client:load="react" example={`Push 72
+Cast Char
+WriteChar
+Push 105
+Cast Char
+WriteChar`}/>
+
+## WriteInt
+
+The `WriteInt` command writes the `Int` at the top of the stack to the program output.
+
+### Syntax
+
+<SyntaxTable command="WriteInt" />
+
+### Parameters
+
+The `WriteInt` command takes no parameters
+
+### Stack parameters
+
+- `Int` - the integer to output.
+
+### Example
+
+<Example client:load="react" example={`Push 10
+WriteInt`}/>

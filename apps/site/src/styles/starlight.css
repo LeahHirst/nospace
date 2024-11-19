@@ -14,7 +14,7 @@
   --sl-color-black: #262626;
   --sl-color-bg-sidebar: #2a2a2b;
   --sl-color-text: #fff;
-  --sl-color-bg-inline-code: #452e58;
+  --sl-color-bg-inline-code: #514f53;
 
   --ns-examples-bg: #151515;
   --ns-examples-fg: #fff;
@@ -23,6 +23,8 @@
   --ns-examples-error-bg: rgba(191, 24, 24, 0.1);
   --ns-examples-error-border: #bf1818;
 
+  --sl-text-h3: 1.5rem;
+  --sl-text-h4: 1.1rem;
 }
 :root nav {
   --sl-color-bg-nav: #531c79;

@@ -1,0 +1,61 @@
+---
+title: Heap Access
+---
+import Example from '../../../components/Example.tsx';
+import SyntaxTable from '../../../components/SyntaxTable.tsx';
+
+The heap allows items to be stored outside of the stack. Items are addressed by an [`Int`](/reference/arithmetic/#integer-literals).
+
+In Nospace items within the heap are untyped. This limitation is due to Whitespace allowing arbitrary heap addresses (for example based upon a user's input). When reading from the heap, values should therefore by cast back to their expected type.
+
+All heap access commands use the `‌‌` prefix.
+
+## Store
+
+The `Store` command stores a value at a given address within the heap.
+
+### Syntax
+
+<SyntaxTable command="Store" />
+
+### Parameters
+
+The `Store` command takes no parameters
+
+### Stack parameters
+
+The following parameters should be pushed in the order expressed below:
+
+- `Int` - the address at which to store the item
+- `Any` - the value to be stored
+
+### Example
+
+This example pushes the number `7` at index `5` in the heap.
+
+<Example client:load="react" example={`Push 5
+Push 7
+Store`}/>
+
+## Retrieve
+
+The `Retrieve` command retrieves the value stored at a given index.
+
+### Syntax
+
+<SyntaxTable command="Retrieve" />
+
+### Parameters
+
+The `Retrieve` command takes no parameters
+
+### Stack parameters
+
+- `Int` - the address to retrieve from
+
+### Example
+
+This example reads the value at index `5`.
+
+<Example client:load="react" example={`Push 5
+Retrieve`}/>
