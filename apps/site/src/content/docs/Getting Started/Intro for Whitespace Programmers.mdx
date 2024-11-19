@@ -1,6 +1,7 @@
 ---
-title: Nospace for WS Programmers
+title: Nospace for Whitespace Programmers
 sidebar:
+  label: Nospace for WS Programmers
   order: 1
 ---
 import Example from '../../../components/Example.tsx';
@@ -23,7 +24,7 @@ Nospace extends the syntax of Whitespace, adding aliasing of Whitespace characte
 
 In addition, a fourth character—the word joiner (WJ; `U+2060`; `⁠`)—is added to the syntax which is used to namespace Nospace-specific type commands.
 
-## Type System
+## Using Types
 
 ### Types by Inference
 
@@ -128,7 +129,7 @@ When type checking, Nospace uses these values to determine whether an operation 
 
 ## Heap Typing
 
-Nospace does not currently type any values on the heap. This limitation is due to Whitespace's ability to allow arbitrary writes to the heap (for example based on a user's input at runtime). In practice this means that when reading off of the heap, developers should take care to cast the value back to a known type to ensure consistency.
+Nospace does not currently type any values on the heap. This limitation is due to Whitespace's ability to write to arbitrary heap addresses (for example based on a user's input at runtime). In practice this means that when reading off of the heap, developers should take care to cast the value back to a known type to ensure consistency.
 
 ## Stack Underflows
 
@@ -136,7 +137,7 @@ In addition to types, Nospace is also able to detect certain situations in which
 
 <Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Pop`} error="TypeError: Cannot perform pop as this would result in a stack underflow." />
 
-There are examples which Nospace will not warn about which may seem surprising at first, for example consider this program which recursively `Pop`s items off the stack:
+There are situations in which underflows will occur but Nospace will not warn about which may seem surprising at first, for example consider this program which recursively `Pop`s items off the stack:
 
 <Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
 

@@ -1,0 +1,74 @@
+---
+title: Types
+sidebar:
+  order: 21
+---
+import Example from '../../../components/Example.tsx';
+import SyntaxTable from '../../../components/SyntaxTable.tsx';
+
+Nospace adds two commands for dealing with types explicitly, `Cast` and `Assert`. Type commands use the `⁠` prefix.
+
+## Type Names
+
+Similar to [labels](http://localhost:4321/reference/control-flow/#label), type names are a sequence of `​`s and `‌`s terminated by a `‍`.
+
+The following primitive type names are reserved:
+
+- `Never` (`‌‌‍`)
+- `Any` (`‌​`)
+- `Unknown` (`‌​​`)
+- `Int` (`​​`)
+- `Char` (`​‌‍`)
+
+Any other name is considered a custom type.
+
+## Cast
+
+The `Cast` command is used to tell Nospace that the top item of the stack is the provided type.
+
+### Syntax
+
+<SyntaxTable command="Cast" inter="xs" />
+
+### Parameters
+
+The `Cast` must be provided with a [type name](#type-names) indicating the type to cast the top item of the stack to.
+
+### Stack parameters
+
+The `Cast` command has no runtime behavior and as such takes no stack parameters.
+
+### Example
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
+Cast MyType`}/>
+
+## Retrieve
+
+The `Retrieve` command retrieves the value stored at a given index.
+
+### Syntax
+
+<SyntaxTable command="Assert" inter="xt" />
+
+### Parameters
+
+The `Assert` must be provided with a [type name](#type-names) indicating the type which the top item in the stack should be compared to.
+
+### Stack parameters
+
+The `Cast` command has no runtime behavior and as such takes no stack parameters.
+
+### Example
+
+Example where the type constraint is satisfied:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
+Cast MyType
+Assert MyType`}/>
+
+Example where the type constraint is not satisfied:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
+Cast MyType
+Assert MyType2`} error={`TypeError: Attempted to assert type "MyType2", but the top item of the stack is of type "MyType".`} />

@@ -1,0 +1,147 @@
+---
+title: Stack Manipulation
+---
+import Example from '../../../components/Example.tsx';
+import SyntaxTable from '../../../components/SyntaxTable.tsx';
+
+## Push
+
+The `Push` command pushes a value onto the top of the stack.
+
+### Syntax
+
+<SyntaxTable command="Push" inter="ss" />
+
+### Parameters
+
+- `Int` - the value to push to the stack
+
+### Stack parameters
+
+The `Push` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`Push 10`}/>
+
+## Duplicate
+
+The `Duplicate` command duplicates the item at the top of the stack.
+
+### Syntax
+
+<SyntaxTable command="Duplicate" />
+
+### Parameters
+
+The `Duplicate` command takes no parameters.
+
+### Stack parameters
+
+The `Duplicate` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`Push 1
+Duplicate`}/>
+
+## Swap
+
+The `Swap` command swaps the item at the top of the stack with the item second from the top.
+
+### Syntax
+
+<SyntaxTable command="Swap" />
+
+### Parameters
+
+The `Swap` command takes no parameters.
+
+### Stack parameters
+
+The `Swap` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`Push 1
+Push 2
+Swap`}/>
+
+## Pop
+
+The `Pop` command discards the item at the top of the stack.
+
+### Syntax
+
+<SyntaxTable command="Pop" />
+
+### Parameters
+
+The `Pop` command takes no parameters.
+
+### Stack parameters
+
+The `Pop` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`Push 1
+Pop`}/>
+
+If there are no items on the stack, Nospace may produce a compile-time error:
+
+<Example client:load="react" example={`Pop`} error="TypeError: Cannot perform pop as this would result in a stack underflow." />
+
+## Copy
+
+The `Copy` command copies the `N`th item on the stack onto the top of the stack. It was added in Whitespace v0.3<sup><a href="#sup1" style="text-decoration: none">1</a></sup>.
+
+### Syntax
+
+<SyntaxTable command="Copy" inter="sts" />
+
+### Parameters
+
+- `Int` - the index from the top of the stack to copy the item from.
+
+### Stack parameters
+
+The `Copy` command consumes no stack parameters, however will copy the `N`th item as per the parameter provided.
+
+### Example
+
+<Example client:load="react" example={`Push 1
+Push 2
+Push 3
+Copy 1`}/>
+
+
+## Slide
+
+The `Slide` command keeps the top item of the stack, but removes `N` items beneth it. It was added in Whitespace v0.3<sup><a href="#sup1" style="text-decoration: none">1</a></sup>.
+
+### Syntax
+
+<SyntaxTable command="Slide" inter="stn" />
+
+### Parameters
+
+- `Int` - the number of items to discard off the stack.
+
+### Stack parameters
+
+The `Slide` command will remove `N` items beneth the top item on the stack, however it's behavior will not change based upon the values removed.
+
+### Example
+
+<Example client:load="react" example={`Push 1
+Push 2
+Push 3
+Slide 2`}/>
+
+<div style="height: 50px"></div>
+---
+<div style="height: 50px"></div>
+
+<a name="sup1"></a>
+> 1. "The copy and slide instructions are an extension implemented in Whitespace 0.3 and are designed to facilitate the implementation of recursive functions. The idea is that local variables are referred to using [Space][Tab][Space], then on return, you can push the return value onto the top of the stack and use [Space][Tab][LF] to discard the local variables." - [Durham University Computing Society: Whitespace Tutorial](https://web.archive.org/web/20150618184706/http://compsoc.dur.ac.uk/whitespace/tutorial.php)

@@ -1,0 +1,147 @@
+---
+title: Control Flow
+---
+import Example from '../../../components/Example.tsx';
+import SyntaxTable from '../../../components/SyntaxTable.tsx';
+
+Control flow commands are used to control the flow of the program. All control flow commands use the `‍` prefix.
+
+## Label
+
+Labels are used to mark locations which can be jumped to from elsewhere in the program. In Nospace, labels are defined by an identifier which consists of a sequence of `​` and `‌` terminated by a `‍`.
+
+### Syntax
+
+<SyntaxTable command="Label" inter="nss" />
+
+### Parameters
+
+The `Label` command requires a unique identifier consisting of a sequence of `​` and `‌` terminated by a `‍`.
+
+### Stack parameters
+
+The `Label` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`Label MyLabel`}/>
+
+## Call
+
+The `Call` command calls a subroutine. Control is given to the provided label and is returned when the `Return` command is executed from within the invoked subroutine.
+
+### Syntax
+
+<SyntaxTable command="Call" inter="nst" />
+
+### Parameters
+
+The `Call` command must be passed the [label](#label) to invoke.
+
+### Stack parameters
+
+The `Call` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`Call MyLabel`}/>
+
+## Jump
+
+The `Jump` command unconditionally jumps to a [label](#label).
+
+### Syntax
+
+<SyntaxTable command="Jump" inter="nsn" />
+
+### Parameters
+
+The `Jump` command must be passed the [label](#label) to jump to.
+
+### Stack parameters
+
+The `Jump` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`Jump MyLabel`}/>
+
+## JumpZero
+
+The `JumpZero` conditionally jumps to the specified [label](#label) if the top item of the stack is `0`. The top item of the stack is discarded as part of the command.
+
+### Syntax
+
+<SyntaxTable command="JumpZero" inter="nts" />
+
+### Parameters
+
+The `JumpZero` command must be passed the [label](#label) to conditionally jump to.
+
+### Stack parameters
+
+- `Int` - the value to evaluate
+
+### Example
+
+<Example client:load="react" example={`JumpZero MyLabel`}/>
+
+## JumpNegative
+
+The `JumpNegative` conditionally jumps to the specified [label](#label) if the top item of the stack is less than `0`. The top item of the stack is discarded as part of the command.
+
+### Syntax
+
+<SyntaxTable command="JumpNegative" inter="ntt" />
+
+### Parameters
+
+The `JumpNegative` command must be passed the [label](#label) to conditionally jump to.
+
+### Stack parameters
+
+- `Int` - the value to evaluate
+
+### Example
+
+<Example client:load="react" example={`JumpNegative MyLabel`}/>
+
+## Return
+
+The `Return` command transfers control from a subroutine back to the [caller](#call). If the `Return` command is invoked outside of a subroutine, it ends the execution of the program.
+
+### Syntax
+
+<SyntaxTable command="Return" />
+
+### Parameters
+
+The `Return` command takes no parameters.
+
+### Stack parameters
+
+The `Return` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`Return`}/>
+
+## End
+
+The `End` command ends the execution of the program.
+
+### Syntax
+
+<SyntaxTable command="End" />
+
+### Parameters
+
+The `End` command takes no parameters.
+
+### Stack parameters
+
+The `End` command takes no stack parameters.
+
+### Example
+
+<Example client:load="react" example={`End`}/>
