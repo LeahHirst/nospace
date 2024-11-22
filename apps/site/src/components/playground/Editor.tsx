@@ -68,20 +68,6 @@ export default function Editor() {
   const [typegraphShown, setTypegraphShown] = useState(false);
   const { getTypegraphUrl, strict, setStrict } = usePlaygroundContext();
 
-  useEffect(() => {
-    if (!monaco) {
-      return;
-    }
-
-    const editor = monaco.editor.getEditors()[0];
-
-    registerNospace(monaco);
-    registerWhitespace(monaco);
-    registerNossembly(monaco);
-
-    monaco.editor.setModelLanguage(editor.getModel()!, 'nospace');
-  }, [monaco]);
-
   const highlightErrors = React.useCallback(() => {
     if (!monaco) {
       return;
@@ -117,8 +103,35 @@ export default function Editor() {
       }
     }
 
+    for (const warning of typeErrors.warnings) {
+      markers.push({
+        startLineNumber: warning.meta.startLn + 1,
+        endLineNumber: warning.meta.endLn + 1,
+        startColumn: warning.meta.startCol + 1,
+        endColumn: warning.meta.endCol + 1,
+        message: `TypeWarning: ${warning.message}`,
+        severity: monaco.MarkerSeverity.Warning,
+      });
+    }
+
     monaco.editor.setModelMarkers(editor.getModel()!, 'owner', markers);
   }, [monaco, strict]);
+
+  useEffect(() => {
+    if (!monaco) {
+      return;
+    }
+
+    const editor = monaco.editor.getEditors()[0];
+
+    registerNospace(monaco);
+    registerWhitespace(monaco);
+    registerNossembly(monaco);
+
+    monaco.editor.setModelLanguage(editor.getModel()!, 'nospace');
+
+    highlightErrors();
+  }, [monaco, highlightErrors]);
 
   React.useEffect(() => {
     if (!monaco) {

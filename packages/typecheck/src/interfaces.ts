@@ -87,4 +87,8 @@ export type UnreachableWarning = Info & {
   type: 'unreachable';
 };
 
-export type TypeWarning = UnreachableWarning;
+export type UnderflowWarning = Info & {
+  type: 'underflow_warn';
+};
+
+export type TypeWarning = UnreachableWarning | UnderflowWarning;
