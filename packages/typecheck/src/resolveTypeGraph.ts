@@ -1,6 +1,11 @@
 import { Type } from '@repo/parser';
 import type { EffectGraphNode } from './effectGraph';
-import type { PushEffect, StackEffect, TypeError } from './interfaces';
+import type {
+  PushEffect,
+  StackEffect,
+  TypeError,
+  TypeWarning,
+} from './interfaces';
 
 function findNodesToResolve(
   rootNode: EffectGraphNode<StackEffect>,
@@ -35,6 +40,22 @@ function resolves(
 
   if (node.effect.effectType === 'swap' || node.effect.effectType === 'copy') {
     throw new Error('Not implemented');
+  }
+
+  if (
+    node.effect.effectType === 'assert' &&
+    !Array.from(node.parents.values())
+      .filter(
+        (x) => x.effect.effectType === 'push' && x.effect.type !== Type.Never,
+      )
+      .every(
+        (x: any) =>
+          x.effect.type === Type.Any ||
+          (node.effect as any).type === Type.Any ||
+          x.effect.type === (node.effect as any).type,
+      )
+  ) {
+    return false;
   }
 
   for (const parent of node.parents) {
@@ -182,19 +203,42 @@ export function resolveTypeGraph(
       }
     }
     if (!progressed) {
-      return Array.from(nodesToResolve)
-        .filter(
-          (node) =>
-            !(
-              node.effect.effectType === 'pop' &&
-              Array.from(node.parents).every(
-                (parent) => parent.effect.effectType === 'pop',
-              )
-            ),
-        )
-        .map((node) => buildTypeError(node, strictMode));
+      return Array.from(nodesToResolve).map((node) =>
+        buildTypeError(node, strictMode),
+      );
     }
   }
 
   return [];
+}
+
+export function generateWarnings(
+  rootNode: EffectGraphNode<StackEffect>,
+): TypeWarning[] {
+  const warnings: TypeWarning[] = [];
+  const visited = new Set<EffectGraphNode<StackEffect>>();
+
+  const queue = [rootNode];
+  while (queue.length > 0) {
+    const node = queue.shift()!;
+    visited.add(node);
+    if (
+      node.effect.effectType === 'pop' &&
+      Array.from(node.parents).some(
+        (p) => p.effect.effectType === 'push' && p.effect.type === Type.Never,
+      )
+    ) {
+      warnings.push({
+        type: 'underflow_warn',
+        message: `Performing ${node.meta?.instructionName.toLowerCase()} may result in a stack underflow.`,
+        meta: node.meta ?? EMPTY_META,
+        node,
+      });
+    }
+    Array.from(node.children)
+      .filter((n) => !visited.has(n))
+      .forEach((n) => queue.push(n));
+  }
+
+  return warnings;
 }

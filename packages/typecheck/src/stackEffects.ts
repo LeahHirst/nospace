@@ -172,7 +172,7 @@ export function produceStackEffects(
       return [
         {
           effectType: 'pop',
-          type: unknownType,
+          type: operation.argument as Type,
         },
         {
           effectType: 'push',

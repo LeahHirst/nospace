@@ -6,7 +6,9 @@ sidebar:
 import Example from '../../../components/Example.tsx';
 import SyntaxTable from '../../../components/SyntaxTable.tsx';
 
-Nospace adds two commands for dealing with types explicitly, `Cast` and `Assert`. Type commands use the `⁠` prefix.
+Nospace adds two commands for dealing with types explicitly, `Cast` and `Assert`. Type commands have no runtime behavior and are instead used to help Nospace statically analyse for type errors.
+
+Type commands use the `⁠` prefix.
 
 ## Type Names
 
@@ -43,9 +45,9 @@ The `Cast` command has no runtime behavior and as such takes no stack parameters
 <Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 1
 Cast MyType`}/>
 
-## Retrieve
+## Assert
 
-The `Retrieve` command retrieves the value stored at a given index.
+The `Assert` command will throw a compile-time error if none of the possible types on the top of the stack are compatible with the specified type name.
 
 ### Syntax
 
@@ -57,7 +59,7 @@ The `Assert` must be provided with a [type name](#type-names) indicating the typ
 
 ### Stack parameters
 
-The `Cast` command has no runtime behavior and as such takes no stack parameters.
+The `Assert` command has no runtime behavior and as such takes no stack parameters.
 
 ### Example
 

@@ -2,7 +2,7 @@ import { NospaceIR } from '@repo/parser';
 import type { TypeError, TypeWarning } from './interfaces';
 import { extractBranches } from './branches';
 import { buildEffectGraph, EffectGraphNode } from './effectGraph';
-import { resolveTypeGraph } from './resolveTypeGraph';
+import { generateWarnings, resolveTypeGraph } from './resolveTypeGraph';
 
 export class Typechecker {
   public rootNode?: EffectGraphNode;
@@ -16,7 +16,8 @@ export class Typechecker {
     this.rootNode = buildEffectGraph(branches, strictMode);
 
     const errors = resolveTypeGraph(this.rootNode, strictMode);
+    const warnings = generateWarnings(this.rootNode);
 
-    return [errors.length === 0, { errors, warnings: [] }];
+    return [errors.length === 0, { errors, warnings }];
   }
 }

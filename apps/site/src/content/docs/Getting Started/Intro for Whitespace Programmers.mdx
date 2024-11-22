@@ -119,11 +119,55 @@ Assert Sentinel
 
 ### Composite Types
 
-// todo
+In many programs, it's often useful to group multiple values together to represent a single entity or structured data. Composite types in Nospace allow you to create such grouped data structures by combining simple types. This is particularly helpful when you need to model entities like records, tuples, or more complex data while leveraging the type system for safety and clarity.
+
+In Nospace, composite types can be represented as a sequence of stack items that together form the structure of the composite type. To define a composite type, you push its constituent elements onto the stack in a specific order and then use the `Cast` instruction to mark them as a composite type.
+
+Consider an example where you need to represent a point in 2D space with integer coordinates `x` and `y`. Here's one way you could construct a `Point` composite type:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Push 10 # x
+Push 20 # y
+Cast Point`} />
+
+At this point, Nospace is aware that there is a `Point` at the top of the stack. Later, coroutines could be written that accept a point as a stack parameter like follows:
+
+<Example client:load="react" languages={["Nospace", "Nossembly"]} example={`Label ScalarMultiply
+\tAssert Int
+\tPush 1
+\tSwap
+\tStore
+
+\tAssert Point
+\tSwap
+\tPush 1
+\tRetrieve
+\tCast Int
+\tMultiply
+\tSwap
+\tPush 1
+\tRetrieve
+\tCast Int
+\tMultiply
+\tCast Any
+\tCast Point
+\tReturn
+
+# Usage:
+Push 1
+Push 2
+Cast Point
+
+Push 5
+Cast Int
+
+Call ScalarMultiply
+
+# output: [5, 10]
+`} />
 
 ## Stack Typing
 
-In Nospace, all items on the stack have an associated type. The default type added to the stack is either `Any` or `Undefined`, depending on whether strict mode is enabled. In strict mode, all items on the stack must first be cast to a determinate type before use.
+In Nospace, items on the stack have an associated type. The default type added to the stack is either `Any` or `Undefined`, depending on whether strict mode is enabled. In strict mode, all items on the stack must first be cast to a determinate type before they can be used.
 
 When type checking, Nospace uses these values to determine whether an operation is permissable.
 
