@@ -19,6 +19,15 @@ export default defineConfig({
     starlight({
       title: 'Nospace: Documentation',
       customCss: ['./src/styles/starlight.css'],
+      head: [
+        {
+          tag: 'script',
+          attrs: {
+            src: 'https://www.googletagmanager.com/gtag/js?id=G-05ZJ9FXQC2',
+            async: true,
+          },
+        },
+      ],
       logo: {
         replacesTitle: true,
         src: './src/assets/logo-dark.svg',
